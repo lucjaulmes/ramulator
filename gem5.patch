@@ -1,3 +1,5 @@
+Patch 0e86fac7254c for gem5 enabling ramulator
+
 diff -r 0e86fac7254c -r d1234c44d57e .hgignore
 --- a/.hgignore	Sat May 31 18:00:23 2014 -0700
 +++ b/.hgignore	Thu Mar 10 03:46:14 2016 +0800
