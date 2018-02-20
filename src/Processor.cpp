@@ -1,7 +1,8 @@
 #include "Processor.h"
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 Processor::Processor(const Config& configs,
     std::vector<const char*> trace_list,
@@ -470,3 +471,5 @@ bool Trace::get_dramtrace_request(long& req_addr, Request::Type& req_type)
     else assert(false);
     return true;
 }
+
+} /* namspace ramulator */

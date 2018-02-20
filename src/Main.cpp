@@ -29,9 +29,10 @@
 #include "STTMRAM.h"
 #include "PCM.h"
 
-using namespace ramulator;
+namespace ramulator
+{
 
-bool ramulator::warmup_complete = false;
+bool warmup_complete = false;
 
 template<typename T>
 void run_dramtrace(const Config& configs, Memory<T, Controller>& memory, const char* tracename) {
@@ -174,6 +175,9 @@ void start_run(const Config& configs, T* spec, const std::vector<const char*>& f
   }
 }
 
+} /* namespace ramulator */
+
+
 int main(int argc, const char *argv[])
 {
     if (argc < 2) {
@@ -181,6 +185,8 @@ int main(int argc, const char *argv[])
             "Example: %s ramulator-configs.cfg --mode=cpu cpu.trace cpu.trace\n", argv[0], argv[0]);
         return 0;
     }
+
+    using namespace ramulator;
 
     Config configs(argv[1]);
 

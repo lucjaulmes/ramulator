@@ -5,7 +5,8 @@
 #include <functional>
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string LPDDR3::standard_name = "LPDDR3";
 std::string LPDDR3::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
@@ -375,3 +376,5 @@ void LPDDR3::init_timing()
     t[int(Command::REFPB)].push_back({Command::REFPB, 1, s.nRFCpb});
     t[int(Command::REFPB)].push_back({Command::ACT, 1, s.nRFCpb});
 }
+
+} /* namespace ramulator */

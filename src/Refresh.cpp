@@ -14,8 +14,6 @@
 #include "DRAM.h"
 #include "DSARP.h"
 
-using namespace ramulator;
-
 namespace ramulator {
 
 /**** DSARP specialization ****/

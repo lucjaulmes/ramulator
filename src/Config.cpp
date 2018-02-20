@@ -1,8 +1,9 @@
 #include "Config.h"
 
-using namespace ramulator;
+namespace ramulator
+{
 
-const std::string ramulator::Config::missing = "";
+const std::string Config::missing = "";
 
 Config::Config(const std::string &fname)
 {
@@ -73,4 +74,4 @@ void Config::parse(const std::string &fname)
     file.close();
 }
 
-
+} /* namespace ramulator */

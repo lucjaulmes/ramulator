@@ -16,9 +16,10 @@
 #include "HBM.h"
 #include "SALP.h"
 
-using namespace ramulator;
+namespace ramulator
+{
 
-std::map<std::string, std::function<MemoryBase *(const Config&, int)> > ramulator::name_to_func = {
+std::map<std::string, std::function<MemoryBase *(const Config&, int)> > name_to_func = {
     {"DDR3", &MemoryFactory<DDR3>::create}, {"DDR4", &MemoryFactory<DDR4>::create},
     {"LPDDR3", &MemoryFactory<LPDDR3>::create}, {"LPDDR4", &MemoryFactory<LPDDR4>::create},
     {"GDDR5", &MemoryFactory<GDDR5>::create},
@@ -54,3 +55,5 @@ bool Gem5Wrapper::send(Request req)
 void Gem5Wrapper::finish(void) {
     mem->finish();
 }
+
+} /*namespace ramulator*/

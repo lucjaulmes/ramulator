@@ -6,7 +6,8 @@
 #include <functional>
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string ALDRAM::standard_name = "ALDRAM";
 std::string ALDRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
@@ -359,3 +360,5 @@ void ALDRAM::init_timing(SpeedEntry speed_entry)
     t[int(Command::ACT)].push_back({Command::PRE, 1, s.nRAS});
     t[int(Command::PRE)].push_back({Command::ACT, 1, s.nRP});
 }
+
+} /* namespace ramulator */

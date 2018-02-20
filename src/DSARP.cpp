@@ -16,7 +16,8 @@
 #include "DSARP.h"
 #include "DRAM.h"
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string DSARP::standard_name = "DSARP";
 std::string DSARP::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Sa", "Ro", "Co"};
@@ -523,3 +524,5 @@ void DSARP::init_timing()
         { Command::ACT, 1, s.nCWL + s.nBL + s.nWR + s.nRPpb, true });
   }
 }
+
+} /* namespace ramulator */

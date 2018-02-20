@@ -5,7 +5,8 @@
 #include <functional>
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string HBM::standard_name = "HBM";
 std::string HBM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
@@ -357,3 +358,5 @@ void HBM::init_timing()
     t[int(Command::REFSB)].push_back({Command::REFSB, 1, s.nRFC});
     t[int(Command::REFSB)].push_back({Command::ACT, 1, s.nRFC});
 }
+
+} /* namespace ramulator */

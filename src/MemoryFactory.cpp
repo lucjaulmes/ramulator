@@ -5,8 +5,6 @@
 #include "HBM.h"
 #include "SALP.h"
 
-using namespace ramulator;
-
 namespace ramulator
 {
 
@@ -66,7 +64,7 @@ MemoryBase *MemoryFactory<SALP>::create(const Config& configs, int cacheline) {
     return (MemoryBase *)populate_memory(configs, spec, channels, ranks);
 }
 
-}
+} /* namespace ramulator */
 
 // This std::function can be used by autoconf AC_CHECK_LIB since
 // apparently it can't detect C++ functions.

@@ -4,7 +4,8 @@
 #include <functional>
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string DDR3::standard_name = "DDR3";
 std::string DDR3::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
@@ -354,3 +355,5 @@ void DDR3::init_timing()
     t[int(Command::ACT)].push_back({Command::PRE, 1, s.nRAS});
     t[int(Command::PRE)].push_back({Command::ACT, 1, s.nRP});
 }
+
+} /* namespace ramulator */

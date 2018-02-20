@@ -4,7 +4,8 @@
 #include <functional>
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string SALP::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Sa", "Ro", "Co"};
 
@@ -646,3 +647,5 @@ void SALP::init_timing()
     }
     // between sibling subarrays
 }
+
+} /* namespace ramulator */

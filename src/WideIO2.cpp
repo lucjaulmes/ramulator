@@ -4,7 +4,8 @@
 #include <functional>
 #include <cassert>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string WideIO2::standard_name = "WideIO2";
 std::string WideIO2::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
@@ -336,3 +337,5 @@ void WideIO2::init_timing()
     t[int(Command::REFPB)].push_back({Command::REFPB, 1, s.nRFCpb});
     t[int(Command::REFPB)].push_back({Command::ACT, 1, s.nRFCpb});
 }
+
+} /* namespace ramulator */

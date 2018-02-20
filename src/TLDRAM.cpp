@@ -6,7 +6,8 @@
 
 #include <iostream>
 
-using namespace ramulator;
+namespace ramulator
+{
 
 std::string TLDRAM::standard_name = "TLDRAM";
 std::string TLDRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
@@ -564,3 +565,5 @@ void TLDRAM::init_timing()
     t[int(Command::PREM)].push_back({Command::ACTM, 1, s.nRPM});
 
 }
+
+} /* namespace ramulator */
