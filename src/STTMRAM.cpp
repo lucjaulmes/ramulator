@@ -14,13 +14,12 @@
 #include <cassert>
 #include <math.h>
 
-using namespace std;
 using namespace ramulator;
 
-string STTMRAM::standard_name = "STTMRAM";
-string STTMRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string STTMRAM::standard_name = "STTMRAM";
+std::string STTMRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum STTMRAM::Org> STTMRAM::org_map = {
+std::map<std::string, enum STTMRAM::Org> STTMRAM::org_map = {
     {"STTMRAM_512Mb_x4", STTMRAM::Org::STTMRAM_512Mb_x4}, {"STTMRAM_512Mb_x8", STTMRAM::Org::STTMRAM_512Mb_x8}, {"STTMRAM_512Mb_x16", STTMRAM::Org::STTMRAM_512Mb_x16},
     {"STTMRAM_1Gb_x4", STTMRAM::Org::STTMRAM_1Gb_x4}, {"STTMRAM_1Gb_x8", STTMRAM::Org::STTMRAM_1Gb_x8}, {"STTMRAM_1Gb_x16", STTMRAM::Org::STTMRAM_1Gb_x16},
     {"STTMRAM_2Gb_x4", STTMRAM::Org::STTMRAM_2Gb_x4}, {"STTMRAM_2Gb_x8", STTMRAM::Org::STTMRAM_2Gb_x8}, {"STTMRAM_2Gb_x16", STTMRAM::Org::STTMRAM_2Gb_x16},
@@ -28,7 +27,7 @@ map<string, enum STTMRAM::Org> STTMRAM::org_map = {
     {"STTMRAM_8Gb_x4", STTMRAM::Org::STTMRAM_8Gb_x4}, {"STTMRAM_8Gb_x8", STTMRAM::Org::STTMRAM_8Gb_x8}, {"STTMRAM_8Gb_x16", STTMRAM::Org::STTMRAM_8Gb_x16},
 };
 
-map<string, enum STTMRAM::Speed> STTMRAM::speed_map = {
+std::map<std::string, enum STTMRAM::Speed> STTMRAM::speed_map = {
     {"STT_1600_1_2", STTMRAM::Speed::STT_1600_1_2}, {"STT_1600_1_5", STTMRAM::Speed::STT_1600_1_5}, {"STT_1600_2_0", STTMRAM::Speed::STT_1600_2_0},
 };
 
@@ -40,13 +39,13 @@ STTMRAM::STTMRAM(Org org, Speed speed) :
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-STTMRAM::STTMRAM(const string& org_str, const string& speed_str) :
+STTMRAM::STTMRAM(const std::string& org_str, const std::string& speed_str) :
     STTMRAM(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -210,7 +209,7 @@ void STTMRAM::init_lambda()
 void STTMRAM::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

@@ -6,13 +6,12 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace ramulator;
 
-string TLDRAM::standard_name = "TLDRAM";
-string TLDRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string TLDRAM::standard_name = "TLDRAM";
+std::string TLDRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum TLDRAM::Org> TLDRAM::org_map = {
+std::map<std::string, enum TLDRAM::Org> TLDRAM::org_map = {
     {"TLDRAM_512Mb_x4", TLDRAM::Org::TLDRAM_512Mb_x4},
     {"TLDRAM_512Mb_x8", TLDRAM::Org::TLDRAM_512Mb_x8},
     {"TLDRAM_512Mb_x16", TLDRAM::Org::TLDRAM_512Mb_x16},
@@ -30,7 +29,7 @@ map<string, enum TLDRAM::Org> TLDRAM::org_map = {
     {"TLDRAM_8Gb_x16", TLDRAM::Org::TLDRAM_8Gb_x16},
 };
 
-map<string, enum TLDRAM::Speed> TLDRAM::speed_map = {
+std::map<std::string, enum TLDRAM::Speed> TLDRAM::speed_map = {
     {"TLDRAM_800D", TLDRAM::Speed::TLDRAM_800D},
     {"TLDRAM_800E", TLDRAM::Speed::TLDRAM_800E},
     {"TLDRAM_1066E", TLDRAM::Speed::TLDRAM_1066E},
@@ -57,13 +56,13 @@ TLDRAM::TLDRAM(Org org, Speed speed, int segment_ratio) :
     this->segment_ratio = segment_ratio;
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-TLDRAM::TLDRAM(const string& org_str, const string& speed_str, int segment_ratio) :
+TLDRAM::TLDRAM(const std::string& org_str, const std::string& speed_str, int segment_ratio) :
     TLDRAM(org_map[org_str], speed_map[speed_str], segment_ratio)
 {
     this->segment_ratio = segment_ratio;
@@ -330,7 +329,7 @@ void TLDRAM::init_lambda()
 void TLDRAM::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

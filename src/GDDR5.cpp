@@ -4,14 +4,13 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string GDDR5::standard_name = "GDDR5";
-string GDDR5::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
+std::string GDDR5::standard_name = "GDDR5";
+std::string GDDR5::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
 
 
-map<string, enum GDDR5::Org> GDDR5::org_map = {
+std::map<std::string, enum GDDR5::Org> GDDR5::org_map = {
     {"GDDR5_512Mb_x16", GDDR5::Org::GDDR5_512Mb_x16}, {"GDDR5_512Mb_x32", GDDR5::Org::GDDR5_512Mb_x32},
     {"GDDR5_1Gb_x16", GDDR5::Org::GDDR5_1Gb_x16}, {"GDDR5_1Gb_x32", GDDR5::Org::GDDR5_1Gb_x32},
     {"GDDR5_2Gb_x16", GDDR5::Org::GDDR5_2Gb_x16}, {"GDDR5_2Gb_x32", GDDR5::Org::GDDR5_2Gb_x32},
@@ -19,7 +18,7 @@ map<string, enum GDDR5::Org> GDDR5::org_map = {
     {"GDDR5_8Gb_x16", GDDR5::Org::GDDR5_8Gb_x16}, {"GDDR5_8Gb_x32", GDDR5::Org::GDDR5_8Gb_x32},
 };
 
-map<string, enum GDDR5::Speed> GDDR5::speed_map = {
+std::map<std::string, enum GDDR5::Speed> GDDR5::speed_map = {
     {"GDDR5_4000", GDDR5::Speed::GDDR5_4000}, {"GDDR5_4500", GDDR5::Speed::GDDR5_4500},
     {"GDDR5_5000", GDDR5::Speed::GDDR5_5000}, {"GDDR5_5500", GDDR5::Speed::GDDR5_5500},
     {"GDDR5_6000", GDDR5::Speed::GDDR5_6000}, {"GDDR5_6500", GDDR5::Speed::GDDR5_6500},
@@ -33,13 +32,13 @@ GDDR5::GDDR5(Org org, Speed speed) :
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-GDDR5::GDDR5(const string& org_str, const string& speed_str) :
+GDDR5::GDDR5(const std::string& org_str, const std::string& speed_str) :
     GDDR5(org_map[org_str], speed_map[speed_str]) 
 {
 }
@@ -220,7 +219,7 @@ void GDDR5::init_lambda()
 void GDDR5::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/ 
     t = timing[int(Level::Channel)];

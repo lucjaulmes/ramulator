@@ -16,19 +16,18 @@
 #include "DSARP.h"
 #include "DRAM.h"
 
-using namespace std;
 using namespace ramulator;
 
-string DSARP::standard_name = "DSARP";
-string DSARP::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Sa", "Ro", "Co"};
+std::string DSARP::standard_name = "DSARP";
+std::string DSARP::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Sa", "Ro", "Co"};
 
-map<string, enum DSARP::Org> DSARP::org_map = {
+std::map<std::string, enum DSARP::Org> DSARP::org_map = {
   {"DSARP_8Gb_x8", DSARP::Org::DSARP_8Gb_x8},
   {"DSARP_16Gb_x9", DSARP::Org::DSARP_16Gb_x8},
   {"DSARP_32Gb_x8", DSARP::Org::DSARP_32Gb_x8},
 };
 
-map<string, enum DSARP::Speed> DSARP::speed_map = {
+std::map<std::string, enum DSARP::Speed> DSARP::speed_map = {
   {"DSARP_1333", DSARP::Speed::DSARP_1333},
 };
 
@@ -41,7 +40,7 @@ DSARP::DSARP(Org org, Speed speed, Type type, int n_sa) :
 {
   init_speed();
   init_prereq();
-  init_rowhit(); // SAUGATA: added row hit function
+  init_rowhit(); // SAUGATA: added row hit std::function
   init_rowopen();
   init_lambda();
   init_timing();
@@ -71,7 +70,7 @@ DSARP::DSARP(Org org, Speed speed, Type type, int n_sa) :
     translate[int(Request::Type::REFRESH)] = Command::REFPB;
 }
 
-DSARP::DSARP(const string& org_str, const string& speed_str, Type type, int n_sa) :
+DSARP::DSARP(const std::string& org_str, const std::string& speed_str, Type type, int n_sa) :
   DSARP(org_map[org_str], speed_map[speed_str], type, n_sa) {}
 
 void DSARP::set_channel_number(int channel) {
@@ -314,7 +313,7 @@ void DSARP::init_lambda()
 void DSARP::init_timing()
 {
   SpeedEntry& s = speed_entry;
-  vector<TimingEntry> *t;
+  std::vector<TimingEntry> *t;
 
   /*** Channel ***/
   t = timing[int(Level::Channel)];

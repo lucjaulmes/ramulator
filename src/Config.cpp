@@ -1,16 +1,15 @@
 #include "Config.h"
 
-using namespace std;
 using namespace ramulator;
 
-const string ramulator::Config::missing = "";
+const std::string ramulator::Config::missing = "";
 
-Config::Config(const string &fname)
+Config::Config(const std::string &fname)
 {
     parse(fname);
 }
 
-void Config::add(const string &name, const string &value)
+void Config::add(const std::string &name, const std::string &value)
 {
     if (contains(name))
     {
@@ -18,39 +17,39 @@ void Config::add(const string &name, const string &value)
         return;
     }
 
-    options.insert(make_pair(name, value));
+    options.insert(std::make_pair(name, value));
 
     if (name == "channels")
-        channels = stoi(value);
+        channels = std::stoi(value);
     else if (name == "ranks")
-        ranks = stoi(value);
+        ranks = std::stoi(value);
     else if (name == "subarrays")
-        subarrays = stoi(value);
+        subarrays = std::stoi(value);
     else if (name == "cpu_tick")
-        cpu_tick = stoi(value);
+        cpu_tick = std::stoi(value);
     else if (name == "mem_tick")
-        mem_tick = stoi(value);
+        mem_tick = std::stoi(value);
     else if (name == "expected_limit_insts")
-        expected_limit_insts = stol(value);
+        expected_limit_insts = std::stol(value);
     else if (name == "warmup_insts")
-        warmup_insts = stol(value);
+        warmup_insts = std::stol(value);
 }
 
-void Config::parse(const string &fname)
+void Config::parse(const std::string &fname)
 {
-    ifstream file(fname);
+    std::ifstream file(fname);
     if (!file.good()) {
         std::cerr << "Bad config file \"" << fname << "\"\n";
         std::exit(1);
     }
 
-    string line;
-    while (getline(file, line))
+    std::string line;
+    while (std::getline(file, line))
     {
         char delim[] = " \t=";
-        vector<string> tokens;
+        std::vector<std::string> tokens;
 
-        for (size_t start = line.find_first_not_of(delim), end; start != string::npos;
+        for (size_t start = line.find_first_not_of(delim), end; start != std::string::npos;
                     start = line.find_first_not_of(delim, end))
         {
             end = line.find_first_of(delim, start);

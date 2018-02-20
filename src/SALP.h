@@ -6,7 +6,6 @@
 #include <vector>
 #include <functional>
 
-using namespace std;
 
 namespace ramulator
 {
@@ -14,16 +13,16 @@ namespace ramulator
 class SALP
 {
 public:
-    string standard_name;
+    std::string standard_name;
     enum class Org;
     enum class Speed;
     enum class Type;
     SALP(Org org, Speed speed, Type type = Type::MASA, int n_sa = 8);
-    SALP(const string& org_str, const string& speed_str, const string& type_str = "SALP-MASA", int n_sa = 8);
+    SALP(const std::string& org_str, const std::string& speed_str, const std::string& type_str = "SALP-MASA", int n_sa = 8);
     
-    static map<string, enum Org> org_map;
-    static map<string, enum Speed> speed_map;
-    static map<string, enum Type> type_map;
+    static std::map<std::string, enum Org> org_map;
+    static std::map<std::string, enum Speed> speed_map;
+    static std::map<std::string, enum Type> type_map;
 
     enum class Type : int
     {
@@ -47,7 +46,7 @@ public:
         MAX
     };
 
-    string command_name[int(Command::MAX)] = {
+    std::string command_name[int(Command::MAX)] = {
         "ACT", "SASEL", "PRE", "PRER",
         "RD",  "WR",    "RDA", "WRA",
         "REF", "PDE",   "PDX", "SRE", "SRX", "PRE_OTHER"
@@ -123,12 +122,12 @@ public:
     };
 
     /* Prerequisite */
-    function<Command(DRAM<SALP>*, Command cmd, int)> prereq[int(Level::MAX)][int(Command::MAX)];
+    std::function<Command(DRAM<SALP>*, Command cmd, int)> prereq[int(Level::MAX)][int(Command::MAX)];
 
-    // SAUGATA: added function object container for row hit status
+    // SAUGATA: added std::function object container for row hit status
     /* Row hit */
-    function<bool(DRAM<SALP>*, Command cmd, int)> rowhit[int(Level::MAX)][int(Command::MAX)];
-    function<bool(DRAM<SALP>*, Command cmd, int)> rowopen[int(Level::MAX)][int(Command::MAX)];
+    std::function<bool(DRAM<SALP>*, Command cmd, int)> rowhit[int(Level::MAX)][int(Command::MAX)];
+    std::function<bool(DRAM<SALP>*, Command cmd, int)> rowopen[int(Level::MAX)][int(Command::MAX)];
 
     /* Timing */
     struct TimingEntry
@@ -138,10 +137,10 @@ public:
         int val;
         bool sibling;
     }; 
-    vector<TimingEntry> timing[int(Level::MAX)][int(Command::MAX)];
+    std::vector<TimingEntry> timing[int(Level::MAX)][int(Command::MAX)];
 
     /* Lambda */
-    function<void(DRAM<SALP>*, int)> lambda[int(Level::MAX)][int(Command::MAX)];
+    std::function<void(DRAM<SALP>*, int)> lambda[int(Level::MAX)][int(Command::MAX)];
 
     /* Organization */
     enum class Org : int
@@ -221,7 +220,7 @@ private:
     void init_speed();
     void init_lambda();
     void init_prereq();
-    void init_rowhit();  // SAUGATA: added function to check for row hits
+    void init_rowhit();  // SAUGATA: added std::function to check for row hits
     void init_rowopen();
     void init_timing();
 };

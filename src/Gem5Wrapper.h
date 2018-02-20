@@ -7,7 +7,6 @@
 
 #include "Config.h"
 
-using namespace std;
 
 namespace ramulator
 {

@@ -4,7 +4,6 @@
 #include <vector>
 #include <functional>
 
-using namespace std;
 
 namespace ramulator
 {
@@ -15,7 +14,7 @@ public:
     bool is_first_command;
     long addr;
     // long addr_row;
-    vector<int> addr_vec;
+    std::vector<int> addr_vec;
     // specify which core this request sent from, for virtual address translation
     int coreid;
 
@@ -32,16 +31,16 @@ public:
 
     long arrive = -1;
     long depart = -1;
-    function<void(Request&)> callback; // call back with more info
+    std::function<void(Request&)> callback; // call back with more info
 
     Request(long addr, Type type, int coreid = 0)
         : is_first_command(true), addr(addr), coreid(coreid), type(type),
       callback([](Request& req){}) {}
 
-    Request(long addr, Type type, function<void(Request&)> callback, int coreid = 0)
+    Request(long addr, Type type, std::function<void(Request&)> callback, int coreid = 0)
         : is_first_command(true), addr(addr), coreid(coreid), type(type), callback(callback) {}
 
-    Request(vector<int>& addr_vec, Type type, function<void(Request&)> callback, int coreid = 0)
+    Request(std::vector<int>& addr_vec, Type type, std::function<void(Request&)> callback, int coreid = 0)
         : is_first_command(true), addr_vec(addr_vec), coreid(coreid), type(type), callback(callback) {}
 
     Request()

@@ -11,7 +11,6 @@
 #include <cassert>
 #include <type_traits>
 
-using namespace std;
 
 namespace ramulator
 {
@@ -40,7 +39,7 @@ public:
     int id;
     long size;
     DRAM* parent;
-    vector<DRAM*> children;
+    std::vector<DRAM*> children;
 
     // State (e.g., Opened, Closed)
     typename T::State state;
@@ -48,7 +47,7 @@ public:
     // State of Rows:
     // There are too many rows for them to be instantiated individually
     // Instead, their bank (or an equivalent entity) tracks their state for them
-    map<int, typename T::State> row_state;
+    std::map<int, typename T::State> row_state;
 
     // Insert a node as one of my child nodes
     void insert(DRAM<T>* child);
@@ -96,25 +95,25 @@ private:
     // Timing
     long cur_clk = 0;
     long next[int(T::Command::MAX)]; // the earliest time in the future when a command could be ready
-    deque<long> prev[int(T::Command::MAX)]; // the most recent history of when commands were issued
+    std::deque<long> prev[int(T::Command::MAX)]; // the most recent history of when commands were issued
 
     // Lookup table for which commands must be preceded by which other commands (i.e., "prerequisite")
     // E.g., a read command to a closed bank must be preceded by an activate command
-    function<typename T::Command(DRAM<T>*, typename T::Command cmd, int)>* prereq;
+    std::function<typename T::Command(DRAM<T>*, typename T::Command cmd, int)>* prereq;
 
     // SAUGATA: added table for row hits
     // Lookup table for whether a command is a row hit
     // E.g., a read command to a closed bank must be preceded by an activate command
-    function<bool(DRAM<T>*, typename T::Command cmd, int)>* rowhit;
-    function<bool(DRAM<T>*, typename T::Command cmd, int)>* rowopen;
+    std::function<bool(DRAM<T>*, typename T::Command cmd, int)>* rowhit;
+    std::function<bool(DRAM<T>*, typename T::Command cmd, int)>* rowopen;
 
     // Lookup table between commands and the state transitions they trigger
     // E.g., an activate command to a closed bank opens both the bank and the row
-    function<void(DRAM<T>*, int)>* lambda;
+    std::function<void(DRAM<T>*, int)>* lambda;
 
     // Lookup table for timing parameters
     // E.g., activate->precharge: tRAS@bank, activate->activate: tRC@bank
-    vector<typename T::TimingEntry>* timing;
+    std::vector<typename T::TimingEntry>* timing;
 
     // Helper Functions
     void update_state(typename T::Command cmd, const int* addr);
@@ -126,35 +125,35 @@ private:
 template <typename T>
 void DRAM<T>::regStats(const std::string& identifier) {
     active_cycles
-        .name("active_cycles" + identifier + "_" + to_string(id))
-        .desc("Total active cycles for level " + identifier + "_" + to_string(id))
+        .name("active_cycles" + identifier + "_" + std::to_string(id))
+        .desc("Total active cycles for level " + identifier + "_" + std::to_string(id))
         .precision(0)
         ;
     refresh_cycles
-        .name("refresh_cycles" + identifier + "_" + to_string(id))
-        .desc("(All-bank refresh only, only valid for rank level) The sum of cycles that is under refresh per memory cycle for level " + identifier + "_" + to_string(id))
+        .name("refresh_cycles" + identifier + "_" + std::to_string(id))
+        .desc("(All-bank refresh only, only valid for rank level) The sum of cycles that is under refresh per memory cycle for level " + identifier + "_" + std::to_string(id))
         .precision(0)
         .flags(Stats::nozero)
         ;
     busy_cycles
-        .name("busy_cycles" + identifier + "_" + to_string(id))
-        .desc("(All-bank refresh only. busy cycles only include refresh time in rank level) The sum of cycles that the DRAM part is active or under refresh for level " + identifier + "_" + to_string(id))
+        .name("busy_cycles" + identifier + "_" + std::to_string(id))
+        .desc("(All-bank refresh only. busy cycles only include refresh time in rank level) The sum of cycles that the DRAM part is active or under refresh for level " + identifier + "_" + std::to_string(id))
         .precision(0)
         ;
     active_refresh_overlap_cycles
-        .name("active_refresh_overlap_cycles" + identifier + "_" + to_string(id))
-        .desc("(All-bank refresh only, only valid for rank level) The sum of cycles that are both active and under refresh per memory cycle for level " + identifier + "_" + to_string(id))
+        .name("active_refresh_overlap_cycles" + identifier + "_" + std::to_string(id))
+        .desc("(All-bank refresh only, only valid for rank level) The sum of cycles that are both active and under refresh per memory cycle for level " + identifier + "_" + std::to_string(id))
         .precision(0)
         .flags(Stats::nozero)
         ;
     serving_requests
-        .name("serving_requests" + identifier + "_" + to_string(id))
-        .desc("The sum of read and write requests that are served in this DRAM element per memory cycle for level " + identifier + "_" + to_string(id))
+        .name("serving_requests" + identifier + "_" + std::to_string(id))
+        .desc("The sum of read and write requests that are served in this DRAM element per memory cycle for level " + identifier + "_" + std::to_string(id))
         .precision(0)
         ;
     average_serving_requests
-        .name("average_serving_requests" + identifier + "_" + to_string(id))
-        .desc("The average of read and write requests that are served in this DRAM element per memory cycle for level " + identifier + "_" + to_string(id))
+        .name("average_serving_requests" + identifier + "_" + std::to_string(id))
+        .desc("The average of read and write requests that are served in this DRAM element per memory cycle for level " + identifier + "_" + std::to_string(id))
         .precision(6)
         ;
 
@@ -164,7 +163,7 @@ void DRAM<T>::regStats(const std::string& identifier) {
 
     // recursively register children statistics
     for (auto child : children) {
-      child->regStats(identifier + "_" + to_string(id));
+      child->regStats(identifier + "_" + std::to_string(id));
     }
 }
 
@@ -198,11 +197,11 @@ DRAM<T>::DRAM(T* spec, typename T::Level level) :
     lambda = spec->lambda[int(level)];
     timing = spec->timing[int(level)];
 
-    fill_n(next, int(T::Command::MAX), -1); // initialize future
+    std::fill_n(next, int(T::Command::MAX), -1); // initialize future
     for (int cmd = 0; cmd < int(T::Command::MAX); cmd++) {
         int dist = 0;
         for (auto& t : timing[cmd])
-            dist = max(dist, t.dist);
+            dist = std::max(dist, t.dist);
 
         if (dist)
             prev[cmd].resize(dist, -1); // initialize history
@@ -277,7 +276,7 @@ bool DRAM<T>::check(typename T::Command cmd, const int* addr, long clk)
     return children[child_id]->check(cmd, addr, clk);
 }
 
-// SAUGATA: added function to check whether a command is a row hit
+// SAUGATA: added std::function to check whether a command is a row hit
 // Check row hits
 template <typename T>
 bool DRAM<T>::check_row_hit(typename T::Command cmd, const int* addr)
@@ -312,11 +311,11 @@ bool DRAM<T>::check_row_open(typename T::Command cmd, const int* addr)
 template <typename T>
 long DRAM<T>::get_next(typename T::Command cmd, const int* addr)
 {
-    long next_clk = max(cur_clk, next[int(cmd)]);
+    long next_clk = std::max(cur_clk, next[int(cmd)]);
     auto node = this;
     for (int l = int(level); l < int(spec->scope[int(cmd)]) && node->children.size() && addr[l + 1] >= 0; l++){
         node = node->children[addr[l + 1]];
-        next_clk = max(next_clk, node->next[int(cmd)]);
+        next_clk = std::max(next_clk, node->next[int(cmd)]);
     }
     return next_clk;
 }
@@ -360,7 +359,7 @@ void DRAM<T>::update_timing(typename T::Command cmd, const int* addr, long clk)
             assert (t.dist == 1);
 
             long future = clk + t.val;
-            next[int(t.cmd)] = max(next[int(t.cmd)], future); // update future
+            next[int(t.cmd)] = std::max(next[int(t.cmd)], future); // update future
         }
 
         return; // stop recursion: only target nodes should be recursed
@@ -381,15 +380,15 @@ void DRAM<T>::update_timing(typename T::Command cmd, const int* addr, long clk)
             continue; // not enough history
 
         long future = past + t.val;
-        next[int(t.cmd)] = max(next[int(t.cmd)], future); // update future
+        next[int(t.cmd)] = std::max(next[int(t.cmd)], future); // update future
         // TIANSHI: for refresh statistics
         if (spec->is_refreshing(cmd) && spec->is_opening(t.cmd)) {
           assert(past == clk);
           begin_of_refreshing = clk;
-          end_of_refreshing = max(end_of_refreshing, next[int(t.cmd)]);
+          end_of_refreshing = std::max(end_of_refreshing, next[int(t.cmd)]);
           refresh_cycles += end_of_refreshing - clk;
           if (cur_serving_requests > 0) {
-            refresh_intervals.push_back(make_pair(begin_of_refreshing, end_of_refreshing));
+            refresh_intervals.push_back(std::make_pair(begin_of_refreshing, end_of_refreshing));
           }
         }
     }
@@ -433,7 +432,7 @@ void DRAM<T>::update_serving_requests(const int* addr, int delta, long clk) {
     end_of_serving = clk;
 
     for (const auto& ref: refresh_intervals) {
-      active_refresh_overlap_cycles += min(end_of_serving, ref.second) - ref.first;
+      active_refresh_overlap_cycles += std::min(end_of_serving, ref.second) - ref.first;
     }
     refresh_intervals.clear();
   }

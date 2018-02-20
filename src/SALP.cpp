@@ -6,9 +6,9 @@
 
 using namespace ramulator;
 
-string SALP::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Sa", "Ro", "Co"};
+std::string SALP::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Sa", "Ro", "Co"};
 
-map<string, enum SALP::Org> SALP::org_map = {
+std::map<std::string, enum SALP::Org> SALP::org_map = {
     {"SALP_512Mb_x4", SALP::Org::SALP_512Mb_x4}, {"SALP_512Mb_x8", SALP::Org::SALP_512Mb_x8}, {"SALP_512Mb_x16", SALP::Org::SALP_512Mb_x16},
     {"SALP_1Gb_x4", SALP::Org::SALP_1Gb_x4}, {"SALP_1Gb_x8", SALP::Org::SALP_1Gb_x8}, {"SALP_1Gb_x16", SALP::Org::SALP_1Gb_x16},
     {"SALP_2Gb_x4", SALP::Org::SALP_2Gb_x4}, {"SALP_2Gb_x8", SALP::Org::SALP_2Gb_x8}, {"SALP_2Gb_x16", SALP::Org::SALP_2Gb_x16},
@@ -16,7 +16,7 @@ map<string, enum SALP::Org> SALP::org_map = {
     {"SALP_8Gb_x4", SALP::Org::SALP_8Gb_x4}, {"SALP_8Gb_x8", SALP::Org::SALP_8Gb_x8}, {"SALP_8Gb_x16", SALP::Org::SALP_8Gb_x16},
 };
 
-map<string, enum SALP::Speed> SALP::speed_map = {
+std::map<std::string, enum SALP::Speed> SALP::speed_map = {
     {"SALP_800D", SALP::Speed::SALP_800D}, {"SALP_800E", SALP::Speed::SALP_800E},
     {"SALP_1066E", SALP::Speed::SALP_1066E}, {"SALP_1066F", SALP::Speed::SALP_1066F}, {"SALP_1066G", SALP::Speed::SALP_1066G},
     {"SALP_1333G", SALP::Speed::SALP_1333G}, {"SALP_1333H", SALP::Speed::SALP_1333H},
@@ -25,7 +25,7 @@ map<string, enum SALP::Speed> SALP::speed_map = {
     {"SALP_2133L", SALP::Speed::SALP_2133L}, {"SALP_2133M", SALP::Speed::SALP_2133M},
 };
 
-map<string, enum SALP::Type> SALP::type_map = {
+std::map<std::string, enum SALP::Type> SALP::type_map = {
     {"SALP-1", SALP::Type::SALP_1},
     {"SALP-2", SALP::Type::SALP_2},
     {"SALP-MASA", SALP::Type::MASA},
@@ -52,13 +52,13 @@ SALP::SALP(Org org, Speed speed, Type type, int n_sa) :
     org_entry.count[int(Level::Row)] = long(org_entry.size) * (1<<20) / tmp;
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-SALP::SALP(const string& org_str, const string& speed_str, const string& type_str, int n_sa) :
+SALP::SALP(const std::string& org_str, const std::string& speed_str, const std::string& type_str, int n_sa) :
     SALP(org_map[org_str], speed_map[speed_str], type_map[type_str], n_sa)
 {
 }
@@ -434,7 +434,7 @@ void SALP::init_lambda()
 void SALP::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

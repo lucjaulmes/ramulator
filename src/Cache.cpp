@@ -51,50 +51,50 @@ Cache::Cache(int size, int assoc, int block_size,
   debug("tag_offset %d", tag_offset);
 
   // regStats
-  cache_read_miss.name(level_string + string("_cache_read_miss"))
+  cache_read_miss.name(level_string + std::string("_cache_read_miss"))
                  .desc("cache read miss count")
                  .precision(0)
                  ;
 
-  cache_write_miss.name(level_string + string("_cache_write_miss"))
+  cache_write_miss.name(level_string + std::string("_cache_write_miss"))
                   .desc("cache write miss count")
                   .precision(0)
                   ;
 
-  cache_total_miss.name(level_string + string("_cache_total_miss"))
+  cache_total_miss.name(level_string + std::string("_cache_total_miss"))
                   .desc("cache total miss count")
                   .precision(0)
                   ;
 
-  cache_eviction.name(level_string + string("_cache_eviction"))
+  cache_eviction.name(level_string + std::string("_cache_eviction"))
                 .desc("number of evict from this level to lower level")
                 .precision(0)
                 ;
 
-  cache_read_access.name(level_string + string("_cache_read_access"))
+  cache_read_access.name(level_string + std::string("_cache_read_access"))
                   .desc("cache read access count")
                   .precision(0)
                   ;
 
-  cache_write_access.name(level_string + string("_cache_write_access"))
+  cache_write_access.name(level_string + std::string("_cache_write_access"))
                     .desc("cache write access count")
                     .precision(0)
                     ;
 
-  cache_total_access.name(level_string + string("_cache_total_access"))
+  cache_total_access.name(level_string + std::string("_cache_total_access"))
                     .desc("cache total access count")
                     .precision(0)
                     ;
 
-  cache_mshr_hit.name(level_string + string("_cache_mshr_hit"))
+  cache_mshr_hit.name(level_string + std::string("_cache_mshr_hit"))
                 .desc("cache mshr hit count")
                 .precision(0)
                 ;
-  cache_mshr_unavailable.name(level_string + string("_cache_mshr_unavailable"))
+  cache_mshr_unavailable.name(level_string + std::string("_cache_mshr_unavailable"))
                          .desc("cache mshr not available count")
                          .precision(0)
                          ;
-  cache_set_unavailable.name(level_string + string("_cache_set_unavailable"))
+  cache_set_unavailable.name(level_string + std::string("_cache_set_unavailable"))
                          .desc("cache set not available")
                          .precision(0)
                          ;
@@ -121,7 +121,7 @@ bool Cache::send(Request req) {
         line->dirty || (req.type == Request::Type::WRITE)));
     lines.erase(line);
     cachesys->hit_list.push_back(
-        make_pair(cachesys->clk + latency[int(level)], req));
+        std::make_pair(cachesys->clk + latency[int(level)], req));
 
     debug("hit, update timestamp %ld", cachesys->clk);
     debug("hit finish time %ld",
@@ -181,7 +181,7 @@ bool Cache::send(Request req) {
     newline->dirty = dirty;
 
     // Add to MSHR entries
-    mshr_entries.push_back(make_pair(req.addr, newline));
+    mshr_entries.push_back(std::make_pair(req.addr, newline));
 
     // Send the request to next level;
     if (!is_last_level) {
@@ -190,7 +190,7 @@ bool Cache::send(Request req) {
       }
     } else {
       cachesys->wait_list.push_back(
-          make_pair(cachesys->clk + latency[int(level)], req));
+          std::make_pair(cachesys->clk + latency[int(level)], req));
     }
     return true;
   }
@@ -201,7 +201,7 @@ void Cache::evictline(long addr, bool dirty) {
   auto it = cache_lines.find(get_index(addr));
   assert(it != cache_lines.end()); // check inclusive cache
   auto& lines = it->second;
-  auto line = find_if(lines.begin(), lines.end(),
+  auto line = std::find_if(lines.begin(), lines.end(),
       [addr, this](Line l){return (l.tag == get_tag(addr));});
 
   assert(line != lines.end());
@@ -219,9 +219,9 @@ std::pair<long, bool> Cache::invalidate(long addr) {
   auto& lines = get_lines(addr);
   if (lines.size() == 0) {
     // The line of this address doesn't exist.
-    return make_pair(0, false);
+    return std::make_pair(0, false);
   }
-  auto line = find_if(lines.begin(), lines.end(),
+  auto line = std::find_if(lines.begin(), lines.end(),
       [addr, this](Line l){return (l.tag == get_tag(addr));});
 
   // If the line is in this level cache, then erase it from
@@ -232,7 +232,7 @@ std::pair<long, bool> Cache::invalidate(long addr) {
     lines.erase(line);
   } else {
     // If it's not in current level, then no need to go up.
-    return make_pair(delay, false);
+    return std::make_pair(delay, false);
   }
 
   if (higher_cache.size()) {
@@ -240,9 +240,9 @@ std::pair<long, bool> Cache::invalidate(long addr) {
     for (auto hc : higher_cache) {
       auto result = hc->invalidate(addr);
       if (result.second) {
-        max_delay = max(max_delay, delay + result.first * 2);
+        max_delay = std::max(max_delay, delay + result.first * 2);
       } else {
-        max_delay = max(max_delay, delay + result.first);
+        max_delay = std::max(max_delay, delay + result.first);
       }
       dirty = dirty || line->dirty || result.second;
     }
@@ -250,7 +250,7 @@ std::pair<long, bool> Cache::invalidate(long addr) {
   } else {
     dirty = line->dirty;
   }
-  return make_pair(delay, dirty);
+  return std::make_pair(delay, dirty);
 }
 
 
@@ -267,7 +267,7 @@ void Cache::evict(std::list<Line>* lines,
   if (higher_cache.size()) {
     for (auto hc : higher_cache) {
       auto result = hc->invalidate(addr);
-      invalidate_time = max(invalidate_time,
+      invalidate_time = std::max(invalidate_time,
           result.first + (result.second ? latency_each[int(level)] : 0));
       dirty = dirty || result.second || victim->dirty;
     }
@@ -284,7 +284,7 @@ void Cache::evict(std::list<Line>* lines,
     // LLC eviction
     if (dirty) {
       Request write_req(addr, Request::Type::WRITE);
-      cachesys->wait_list.push_back(make_pair(
+      cachesys->wait_list.push_back(std::make_pair(
           cachesys->clk + invalidate_time + latency[int(level)],
           write_req));
 
@@ -304,7 +304,7 @@ std::list<Cache::Line>::iterator Cache::allocate_line(
   if (need_eviction(lines, addr)) {
     // Get victim.
     // The first one might still be locked due to reorder in MC
-    auto victim = find_if(lines.begin(), lines.end(),
+    auto victim = std::find_if(lines.begin(), lines.end(),
         [this](Line line) {
           bool check = !line.lock;
           if (!is_first_level) {
@@ -333,7 +333,7 @@ std::list<Cache::Line>::iterator Cache::allocate_line(
 
 bool Cache::is_hit(std::list<Line>& lines, long addr,
     std::list<Line>::iterator* pos_ptr) {
-  auto pos = find_if(lines.begin(), lines.end(),
+  auto pos = std::find_if(lines.begin(), lines.end(),
       [addr, this](Line l){return (l.tag == get_tag(addr));});
   *pos_ptr = pos;
   if (pos == lines.end()) {
@@ -349,7 +349,7 @@ void Cache::concatlower(Cache* lower) {
 };
 
 bool Cache::need_eviction(const std::list<Line>& lines, long addr) {
-  if (find_if(lines.begin(), lines.end(),
+  if (std::find_if(lines.begin(), lines.end(),
       [addr, this](Line l){
         return (get_tag(addr) == l.tag);})
       != lines.end()) {
@@ -367,7 +367,7 @@ bool Cache::need_eviction(const std::list<Line>& lines, long addr) {
 void Cache::callback(Request& req) {
   debug("level %d", int(level));
 
-  auto it = find_if(mshr_entries.begin(), mshr_entries.end(),
+  auto it = std::find_if(mshr_entries.begin(), mshr_entries.end(),
       [&req, this](std::pair<long, std::list<Line>::iterator> mshr_entry) {
         return (align(mshr_entry.first) == align(req.addr));
       });

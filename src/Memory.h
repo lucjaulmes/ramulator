@@ -19,11 +19,10 @@
 #include <cassert>
 #include <tuple>
 
-using namespace std;
 
-typedef vector<unsigned int> MapSrcVector;
-typedef map<unsigned int, MapSrcVector > MapSchemeEntry;
-typedef map<unsigned int, MapSchemeEntry> MapScheme;
+typedef std::vector<unsigned int> MapSrcVector;
+typedef std::map<unsigned int, MapSrcVector > MapSchemeEntry;
+typedef std::map<unsigned int, MapSchemeEntry> MapScheme;
 
 namespace ramulator
 {
@@ -86,25 +85,25 @@ public:
       MAX,
     } translation = Translation::None;
 
-    std::map<string, Translation> name_to_translation = {
+    std::map<std::string, Translation> name_to_translation = {
       {"None", Translation::None},
       {"Random", Translation::Random},
     };
 
-    vector<int> free_physical_pages;
+    std::vector<int> free_physical_pages;
     long free_physical_pages_remaining;
-    map<pair<int, long>, long> page_translation;
+    std::map<std::pair<int, long>, long> page_translation;
 
-    vector<Controller<T>*> ctrls;
+    std::vector<Controller<T>*> ctrls;
     T * spec;
-    vector<int> addr_bits;
-    string mapping_file;
+    std::vector<int> addr_bits;
+    std::string mapping_file;
     bool use_mapping_file;
     bool dump_mapping;
     
     int tx_bits;
 
-    Memory(const Config& configs, vector<Controller<T>*> ctrls)
+    Memory(const Config& configs, std::vector<Controller<T>*> ctrls)
         : ctrls(ctrls),
           spec(ctrls[0]->channel->spec),
           addr_bits(int(T::Level::MAX))
@@ -349,8 +348,8 @@ public:
         return false;
     }
     
-    void init_mapping_with_file(string filename){
-        ifstream file(filename);
+    void init_mapping_with_file(std::string filename){
+        std::ifstream file(filename);
         assert(file.good() && "Bad mapping file");
         // possible line types are:
         // 0. Empty line
@@ -358,21 +357,21 @@ public:
         // 2. Direct range assignment : component N:M = x:y
         // 3. XOR bit assignment      : component N   = x y z ...
         // 4. Comment line            : # comment here
-        string line;
+        std::string line;
         char delim[] = " \t";
-        while (getline(file, line)) {
+        while (std::getline(file, line)) {
             short capture_flags = 0;
             int level = -1;
             int target_bit = -1, target_bit2 = -1;
             int source_bit = -1, source_bit2 = -1;
-            // cout << "Processing: " << line << endl;
+            // std::cout << "Processing: " << line << std::endl;
             bool is_range = false;
             while (true) { // process next word
                 size_t start = line.find_first_not_of(delim);
-                if (start == string::npos) // no more words
+                if (start == std::string::npos) // no more words
                     break;
                 size_t end = line.find_first_of(delim, start);
-                string word = line.substr(start, end - start);
+                std::string word = line.substr(start, end - start);
                 
                 if (word.at(0) == '#')// starting a comment
                     break;
@@ -383,7 +382,7 @@ public:
                     case 0: // capturing the component name
                         // fetch component level from channel spec
                         for (int i = 0; i < int(T::Level::MAX); i++)
-                            if (word.find(T::level_str[i]) != string::npos) {
+                            if (word.find(T::level_str[i]) != std::string::npos) {
                                 level = i;
                                 capture_flags ++;
                             }
@@ -391,42 +390,42 @@ public:
 
                     case 1: // capturing target bit(s)
                         col_index = word.find(":");
-                        if ( col_index != string::npos ){
-                            target_bit2 = stoi(word.substr(col_index+1));
+                        if ( col_index != std::string::npos ){
+                            target_bit2 = std::stoi(word.substr(col_index+1));
                             word = word.substr(0,col_index);
                             is_range = true;
                         }
-                        target_bit = stoi(word);
+                        target_bit = std::stoi(word);
                         capture_flags ++;
                         break;
 
                     case 2: //this should be the delimiter
-                        assert(word.find("=") != string::npos);
+                        assert(word.find("=") != std::string::npos);
                         capture_flags ++;
                         break;
 
                     case 3:
                         if (is_range){
                             col_index = word.find(":");
-                            source_bit  = stoi(word.substr(0,col_index));
-                            source_bit2 = stoi(word.substr(col_index+1));
+                            source_bit  = std::stoi(word.substr(0,col_index));
+                            source_bit2 = std::stoi(word.substr(col_index+1));
                             assert(source_bit2 - source_bit == target_bit2 - target_bit);
-                            source_min = min(source_bit, source_bit2);
-                            target_min = min(target_bit, target_bit2);
-                            target_max = max(target_bit, target_bit2);
+                            source_min = std::min(source_bit, source_bit2);
+                            target_min = std::min(target_bit, target_bit2);
+                            target_max = std::max(target_bit, target_bit2);
                             while (target_min <= target_max){
                                 mapping_scheme[level][target_min].push_back(source_min);
-                                // cout << target_min << " <- " << source_min << endl;
+                                // std::cout << target_min << " <- " << source_min << std::endl;
                                 source_min ++;
                                 target_min ++;
                             }
                         }
                         else {
-                            source_bit = stoi(word);
+                            source_bit = std::stoi(word);
                             mapping_scheme[level][target_bit].push_back(source_bit);
                         }
                 }
-                if (end == string::npos) { // this is the last word
+                if (end == std::string::npos) { // this is the last word
                     break;
                 }
                 line = line.substr(end);
@@ -437,17 +436,17 @@ public:
     }
     
     void dump_mapping_scheme(){
-        cout << "Mapping Scheme: " << endl;
+        std::cout << "Mapping Scheme: " << std::endl;
         for (MapScheme::iterator mapit = mapping_scheme.begin(); mapit != mapping_scheme.end(); mapit++)
         {
             int level = mapit->first;
             for (MapSchemeEntry::iterator entit = mapit->second.begin(); entit != mapit->second.end(); entit++){
-                cout << T::level_str[level] << "[" << entit->first << "] := ";
-                cout << "PhysicalAddress[" << *(entit->second.begin()) << "]";
+                std::cout << T::level_str[level] << "[" << entit->first << "] := ";
+                std::cout << "PhysicalAddress[" << *(entit->second.begin()) << "]";
                 entit->second.erase(entit->second.begin());
                 for (MapSrcVector::iterator it = entit->second.begin() ; it != entit->second.end(); it ++)
-                    cout << " xor PhysicalAddress[" << *it << "]";
-                cout << endl;
+                    std::cout << " xor PhysicalAddress[" << *it << "]";
+                std::cout << std::endl;
             }
         }
     }
@@ -465,7 +464,7 @@ public:
             }
         }
         // Row address is an integer.
-        addr_bits[int(T::Level::Row)] = min((int)sizeof(int)*8, max(addr_total_bits, calc_log2(sz[int(T::Level::Row)])));
+        addr_bits[int(T::Level::Row)] = std::min((int)sizeof(int)*8, std::max(addr_total_bits, calc_log2(sz[int(T::Level::Row)])));
 
         // printf("Address: %lx => ",addr);
         for (unsigned int lvl = 0; lvl < int(T::Level::MAX); lvl++)
@@ -528,7 +527,7 @@ public:
               return addr;
             }
             case int(Translation::Random): {
-                auto target = make_pair(coreid, virtual_page_number);
+                auto target = std::make_pair(coreid, virtual_page_number);
                 if(page_translation.find(target) == page_translation.end()) {
                     // page doesn't exist, so assign a new page
                     // make sure there are physical pages left to be assigned

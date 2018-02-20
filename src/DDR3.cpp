@@ -4,13 +4,12 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string DDR3::standard_name = "DDR3";
-string DDR3::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string DDR3::standard_name = "DDR3";
+std::string DDR3::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum DDR3::Org> DDR3::org_map = {
+std::map<std::string, enum DDR3::Org> DDR3::org_map = {
     {"DDR3_512Mb_x4", DDR3::Org::DDR3_512Mb_x4}, {"DDR3_512Mb_x8", DDR3::Org::DDR3_512Mb_x8}, {"DDR3_512Mb_x16", DDR3::Org::DDR3_512Mb_x16},
     {"DDR3_1Gb_x4", DDR3::Org::DDR3_1Gb_x4}, {"DDR3_1Gb_x8", DDR3::Org::DDR3_1Gb_x8}, {"DDR3_1Gb_x16", DDR3::Org::DDR3_1Gb_x16},
     {"DDR3_2Gb_x4", DDR3::Org::DDR3_2Gb_x4}, {"DDR3_2Gb_x8", DDR3::Org::DDR3_2Gb_x8}, {"DDR3_2Gb_x16", DDR3::Org::DDR3_2Gb_x16},
@@ -18,7 +17,7 @@ map<string, enum DDR3::Org> DDR3::org_map = {
     {"DDR3_8Gb_x4", DDR3::Org::DDR3_8Gb_x4}, {"DDR3_8Gb_x8", DDR3::Org::DDR3_8Gb_x8}, {"DDR3_8Gb_x16", DDR3::Org::DDR3_8Gb_x16},
 };
 
-map<string, enum DDR3::Speed> DDR3::speed_map = {
+std::map<std::string, enum DDR3::Speed> DDR3::speed_map = {
     {"DDR3_800D", DDR3::Speed::DDR3_800D}, {"DDR3_800E", DDR3::Speed::DDR3_800E},
     {"DDR3_1066E", DDR3::Speed::DDR3_1066E}, {"DDR3_1066F", DDR3::Speed::DDR3_1066F}, {"DDR3_1066G", DDR3::Speed::DDR3_1066G},
     {"DDR3_1333G", DDR3::Speed::DDR3_1333G}, {"DDR3_1333H", DDR3::Speed::DDR3_1333H},
@@ -35,13 +34,13 @@ DDR3::DDR3(Org org, Speed speed) :
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-DDR3::DDR3(const string& org_str, const string& speed_str) :
+DDR3::DDR3(const std::string& org_str, const std::string& speed_str) :
     DDR3(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -220,7 +219,7 @@ void DDR3::init_lambda()
 void DDR3::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

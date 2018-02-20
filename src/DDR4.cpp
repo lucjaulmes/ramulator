@@ -5,19 +5,18 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string DDR4::standard_name = "DDR4";
-string DDR4::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
+std::string DDR4::standard_name = "DDR4";
+std::string DDR4::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
 
-map<string, enum DDR4::Org> DDR4::org_map = {
+std::map<std::string, enum DDR4::Org> DDR4::org_map = {
     {"DDR4_2Gb_x4", DDR4::Org::DDR4_2Gb_x4}, {"DDR4_2Gb_x8", DDR4::Org::DDR4_2Gb_x8}, {"DDR4_2Gb_x16", DDR4::Org::DDR4_2Gb_x16},
     {"DDR4_4Gb_x4", DDR4::Org::DDR4_4Gb_x4}, {"DDR4_4Gb_x8", DDR4::Org::DDR4_4Gb_x8}, {"DDR4_4Gb_x16", DDR4::Org::DDR4_4Gb_x16},
     {"DDR4_8Gb_x4", DDR4::Org::DDR4_8Gb_x4}, {"DDR4_8Gb_x8", DDR4::Org::DDR4_8Gb_x8}, {"DDR4_8Gb_x16", DDR4::Org::DDR4_8Gb_x16},
 };
 
-map<string, enum DDR4::Speed> DDR4::speed_map = {
+std::map<std::string, enum DDR4::Speed> DDR4::speed_map = {
     {"DDR4_1600K", DDR4::Speed::DDR4_1600K}, {"DDR4_1600L", DDR4::Speed::DDR4_1600L},
     {"DDR4_1866M", DDR4::Speed::DDR4_1866M}, {"DDR4_1866N", DDR4::Speed::DDR4_1866N},
     {"DDR4_2133P", DDR4::Speed::DDR4_2133P}, {"DDR4_2133R", DDR4::Speed::DDR4_2133R},
@@ -33,13 +32,13 @@ DDR4::DDR4(Org org, Speed speed)
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-DDR4::DDR4(const string& org_str, const string& speed_str) :
+DDR4::DDR4(const std::string& org_str, const std::string& speed_str) :
     DDR4(org_map[org_str], speed_map[speed_str]) 
 {
 }
@@ -246,7 +245,7 @@ void DDR4::init_lambda()
 void DDR4::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/ 
     t = timing[int(Level::Channel)];

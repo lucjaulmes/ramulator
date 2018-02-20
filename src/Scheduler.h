@@ -58,7 +58,6 @@ Current Row Policies:
 #include <algorithm>
 #include <cassert>
 
-using namespace std;
 
 namespace ramulator
 {
@@ -94,7 +93,7 @@ public:
         }
     }
 
-    list<Request>::iterator get_head(list<Request>& q)
+    std::list<Request>::iterator get_head(std::list<Request>& q)
     {
         // TODO make the decision at compile time
         if (type != Type::FRFCFS_PriorHit) {
@@ -126,14 +125,14 @@ public:
             }
 
             // prepare a list of hit request
-            vector<vector<int>> hit_reqs;
+            std::vector<std::vector<int>> hit_reqs;
             for (auto itr = q.begin() ; itr != q.end() ; ++itr) {
                 if (this->ctrl->is_row_hit(itr)) {
                     auto begin = itr->addr_vec.begin();
                     // TODO Here it assumes all DRAM standards use PRE to close a row
                     // It's better to make it more general.
                     auto end = begin + int(ctrl->channel->spec->scope[int(T::Command::PRE)]) + 1;
-                    vector<int> rowgroup(begin, end); // bank or subarray
+                    std::vector<int> rowgroup(begin, end); // bank or subarray
                     hit_reqs.push_back(rowgroup);
                 }
             }
@@ -148,12 +147,12 @@ public:
                     // TODO Here it assumes all DRAM standards use PRE to close a row
                     // It's better to make it more general.
                     auto end = begin + int(ctrl->channel->spec->scope[int(T::Command::PRE)]) + 1;
-                    vector<int> rowgroup(begin, end); // bank or subarray
+                    std::vector<int> rowgroup(begin, end); // bank or subarray
                     for (const auto& hit_req_rowgroup : hit_reqs) {
                         if (rowgroup == hit_req_rowgroup) {
                             violate_hit = true;
                             break;
-                        }  
+                        }
                     }
                 }
                 if (violate_hit) {
@@ -173,8 +172,8 @@ public:
 
 //Compare functions for each memory schedulers
 private:
-    typedef list<Request>::iterator ReqIter;
-    function<ReqIter(ReqIter, ReqIter)> compare[int(Type::MAX)] = {
+    typedef std::list<Request>::iterator ReqIter;
+    std::function<ReqIter(ReqIter, ReqIter)> compare[int(Type::MAX)] = {
         // FCFS
         [this] (ReqIter req1, ReqIter req2) {
             if (req1->arrive <= req2->arrive) return req1;
@@ -253,37 +252,37 @@ public:
         }
     }
 
-    vector<int> get_victim(typename T::Command cmd)
+    std::vector<int> get_victim(typename T::Command cmd)
     {
         return policy[int(type)](cmd);
     }
 
 private:
-    function<vector<int>(typename T::Command)> policy[int(Type::MAX)] = {
+    std::function<std::vector<int>(typename T::Command)> policy[int(Type::MAX)] = {
         // Closed
-        [this] (typename T::Command cmd) -> vector<int> {
+        [this] (typename T::Command cmd) -> std::vector<int> {
             for (auto& kv : this->ctrl->rowtable->table) {
                 if (!this->ctrl->is_ready(cmd, kv.first))
                     continue;
                 return kv.first;
             }
-            return vector<int>();},
+            return std::vector<int>();},
 
         // ClosedAP
-        [this] (typename T::Command cmd) -> vector<int> {
+        [this] (typename T::Command cmd) -> std::vector<int> {
             for (auto& kv : this->ctrl->rowtable->table) {
                 if (!this->ctrl->is_ready(cmd, kv.first))
                     continue;
                 return kv.first;
             }
-            return vector<int>();},
+            return std::vector<int>();},
 
         // Opened
         [this] (typename T::Command cmd) {
-            return vector<int>();},
+            return std::vector<int>();},
 
         // Timeout
-        [this] (typename T::Command cmd) -> vector<int> {
+        [this] (typename T::Command cmd) -> std::vector<int> {
             for (auto& kv : this->ctrl->rowtable->table) {
                 auto& entry = kv.second;
                 if (this->ctrl->clk - entry.timestamp < timeout)
@@ -292,7 +291,7 @@ private:
                     continue;
                 return kv.first;
             }
-            return vector<int>();}
+            return std::vector<int>();}
     };
 
 };
@@ -310,15 +309,15 @@ public:
         long timestamp;
     };
 
-    map<vector<int>, Entry> table;
+    std::map<std::vector<int>, Entry> table;
 
     RowTable(Controller<T>* ctrl) : ctrl(ctrl) {}
 
-    void update(typename T::Command cmd, const vector<int>& addr_vec, long clk)
+    void update(typename T::Command cmd, const std::vector<int>& addr_vec, long clk)
     {
         auto begin = addr_vec.begin();
         auto end = begin + int(T::Level::Row);
-        vector<int> rowgroup(begin, end); // bank or subarray
+        std::vector<int> rowgroup(begin, end); // bank or subarray
         int row = *end;
 
         T* spec = ctrl->channel->spec;
@@ -357,12 +356,12 @@ public:
         } /* closing */
     }
 
-    int get_hits(const vector<int>& addr_vec, const bool to_opened_row = false)
+    int get_hits(const std::vector<int>& addr_vec, const bool to_opened_row = false)
     {
         auto begin = addr_vec.begin();
         auto end = begin + int(T::Level::Row);
 
-        vector<int> rowgroup(begin, end);
+        std::vector<int> rowgroup(begin, end);
         int row = *end;
 
         auto itr = table.find(rowgroup);
@@ -375,11 +374,11 @@ public:
         return itr->second.hits;
     }
 
-    int get_open_row(const vector<int>& addr_vec) {
+    int get_open_row(const std::vector<int>& addr_vec) {
         auto begin = addr_vec.begin();
         auto end = begin + int(T::Level::Row);
 
-        vector<int> rowgroup(begin, end);
+        std::vector<int> rowgroup(begin, end);
 
         auto itr = table.find(rowgroup);
         if(itr == table.end())

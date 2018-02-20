@@ -5,19 +5,18 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string LPDDR4::standard_name = "LPDDR4";
-string LPDDR4::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string LPDDR4::standard_name = "LPDDR4";
+std::string LPDDR4::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum LPDDR4::Org> LPDDR4::org_map = {
+std::map<std::string, enum LPDDR4::Org> LPDDR4::org_map = {
     {"LPDDR4_4Gb_x16", LPDDR4::Org::LPDDR4_4Gb_x16},
     {"LPDDR4_6Gb_x16", LPDDR4::Org::LPDDR4_6Gb_x16},
     {"LPDDR4_8Gb_x16", LPDDR4::Org::LPDDR4_8Gb_x16},
 };
 
-map<string, enum LPDDR4::Speed> LPDDR4::speed_map = {
+std::map<std::string, enum LPDDR4::Speed> LPDDR4::speed_map = {
     {"LPDDR4_1600", LPDDR4::Speed::LPDDR4_1600},
     {"LPDDR4_2400", LPDDR4::Speed::LPDDR4_2400},
     {"LPDDR4_3200", LPDDR4::Speed::LPDDR4_3200},
@@ -30,13 +29,13 @@ LPDDR4::LPDDR4(Org org, Speed speed)
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-LPDDR4::LPDDR4(const string& org_str, const string& speed_str) :
+LPDDR4::LPDDR4(const std::string& org_str, const std::string& speed_str) :
     LPDDR4(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -226,7 +225,7 @@ void LPDDR4::init_lambda()
 void LPDDR4::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

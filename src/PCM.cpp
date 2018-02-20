@@ -14,13 +14,12 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string PCM::standard_name = "PCM";
-string PCM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string PCM::standard_name = "PCM";
+std::string PCM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum PCM::Org> PCM::org_map = {
+std::map<std::string, enum PCM::Org> PCM::org_map = {
     {"PCM_512Mb_x4", PCM::Org::PCM_512Mb_x4}, {"PCM_512Mb_x8", PCM::Org::PCM_512Mb_x8}, {"PCM_512Mb_x16", PCM::Org::PCM_512Mb_x16},
     {"PCM_1Gb_x4", PCM::Org::PCM_1Gb_x4}, {"PCM_1Gb_x8", PCM::Org::PCM_1Gb_x8}, {"PCM_1Gb_x16", PCM::Org::PCM_1Gb_x16},
     {"PCM_2Gb_x4", PCM::Org::PCM_2Gb_x4}, {"PCM_2Gb_x8", PCM::Org::PCM_2Gb_x8}, {"PCM_2Gb_x16", PCM::Org::PCM_2Gb_x16},
@@ -28,7 +27,7 @@ map<string, enum PCM::Org> PCM::org_map = {
     {"PCM_8Gb_x4", PCM::Org::PCM_8Gb_x4}, {"PCM_8Gb_x8", PCM::Org::PCM_8Gb_x8}, {"PCM_8Gb_x16", PCM::Org::PCM_8Gb_x16},
 };
 
-map<string, enum PCM::Speed> PCM::speed_map = {
+std::map<std::string, enum PCM::Speed> PCM::speed_map = {
     {"PCM_800D", PCM::Speed::PCM_800D}
 };
 
@@ -40,13 +39,13 @@ PCM::PCM(Org org, Speed speed) :
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-PCM::PCM(const string& org_str, const string& speed_str) :
+PCM::PCM(const std::string& org_str, const std::string& speed_str) :
     PCM(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -210,7 +209,7 @@ void PCM::init_lambda()
 void PCM::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

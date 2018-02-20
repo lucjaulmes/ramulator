@@ -11,7 +11,6 @@
 #include "WideIO2.h"
 #include "SALP.h"
 
-using namespace std;
 
 namespace ramulator
 {
@@ -40,7 +39,7 @@ public:
         if (default_channels == 0) default_channels = channels;
         if (default_ranks == 0) default_ranks = ranks;
 
-        vector<Controller<T> *> ctrls;
+        std::vector<Controller<T> *> ctrls;
         for (int c = 0; c < channels; c++){
             DRAM<T>* channel = new DRAM<T>(spec, T::Level::Channel);
             channel->id = c;
@@ -56,13 +55,13 @@ public:
 
     static MemoryBase *create(const Config& configs, int cacheline)
     {
-        int channels = stoi(configs["channels"], NULL, 0);
-        int ranks = stoi(configs["ranks"], NULL, 0);
+        int channels = std::stoi(configs["channels"], NULL, 0);
+        int ranks = std::stoi(configs["ranks"], NULL, 0);
         
         validate(channels, ranks, configs);
 
-        const string& org_name = configs["org"];
-        const string& speed_name = configs["speed"];
+        const std::string& org_name = configs["org"];
+        const std::string& speed_name = configs["speed"];
 
         T *spec = new T(org_name, speed_name);
 

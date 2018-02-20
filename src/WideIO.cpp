@@ -4,20 +4,19 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string WideIO::standard_name = "WideIO";
-string WideIO::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string WideIO::standard_name = "WideIO";
+std::string WideIO::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum WideIO::Org> WideIO::org_map = {
+std::map<std::string, enum WideIO::Org> WideIO::org_map = {
     {"WideIO_1Gb", WideIO::Org::WideIO_1Gb},
     {"WideIO_2Gb", WideIO::Org::WideIO_2Gb},
     {"WideIO_4Gb", WideIO::Org::WideIO_4Gb},
     {"WideIO_8Gb", WideIO::Org::WideIO_8Gb},
 };
 
-map<string, enum WideIO::Speed> WideIO::speed_map = {
+std::map<std::string, enum WideIO::Speed> WideIO::speed_map = {
     {"WideIO_200", WideIO::Speed::WideIO_200}, 
     {"WideIO_266", WideIO::Speed::WideIO_266},
 };
@@ -29,13 +28,13 @@ WideIO::WideIO(Org org, Speed speed) :
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-WideIO::WideIO(const string& org_str, const string& speed_str) :
+WideIO::WideIO(const std::string& org_str, const std::string& speed_str) :
     WideIO(org_map[org_str], speed_map[speed_str]) 
 {
 }
@@ -206,7 +205,7 @@ void WideIO::init_lambda()
 void WideIO::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/ 
     t = timing[int(Level::Channel)];

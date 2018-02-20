@@ -61,11 +61,11 @@ public:
     long clk = 0;
     long retired = 0;
     int id = 0;
-    function<bool(Request)> send;
+    std::function<bool(Request)> send;
 
     Core(const Config& configs, int coreid,
         const char* trace_fname,
-        function<bool(Request)> send_next, Cache* llc,
+        std::function<bool(Request)> send_next, Cache* llc,
         std::shared_ptr<CacheSystem> cachesys, MemoryBase& memory);
     void tick();
     void receive(Request& req);
@@ -74,7 +74,7 @@ public:
     bool finished();
     bool has_reached_limit();
     long get_insts(); // the number of the instructions issued to the core
-    function<void(Request&)> callback;
+    std::function<void(Request&)> callback;
 
     bool no_core_caches = true;
     bool no_shared_cache = true;
@@ -115,8 +115,8 @@ private:
 
 class Processor {
 public:
-    Processor(const Config& configs, vector<const char*> trace_list,
-        function<bool(Request)> send, MemoryBase& memory);
+    Processor(const Config& configs, std::vector<const char*> trace_list,
+        std::function<bool(Request)> send, MemoryBase& memory);
     void tick();
     void receive(Request& req);
     void reset_stats();

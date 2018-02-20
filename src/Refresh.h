@@ -25,7 +25,6 @@
 #include "DSARP.h"
 #include "ALDRAM.h"
 
-using namespace std;
 
 namespace ramulator {
 
@@ -38,7 +37,7 @@ public:
   Controller<T>* ctrl;
   long clk, refreshed;
   // Per-bank refresh counter to track the refresh progress for each rank
-  vector<int> bank_ref_counters;
+  std::vector<int> bank_ref_counters;
   int max_rank_count, max_bank_count;
   int level_chan, level_rank, level_bank, level_sa;
 
@@ -51,7 +50,7 @@ public:
     // Init refresh counters
     for (int r = 0; r < max_rank_count; r++) {
       bank_ref_counters.push_back(0);
-      bank_refresh_backlog.push_back(new vector<int>(max_bank_count, 0));
+      bank_refresh_backlog.push_back(new std::vector<int>(max_bank_count, 0));
     }
 
     level_chan = (int)T::Level::Channel;
@@ -84,9 +83,9 @@ public:
 
 private:
   // Keeping track of refresh status of every bank: + means ahead of schedule, - means behind schedule
-  vector<vector<int>*> bank_refresh_backlog;
+  std::vector<std::vector<int>*> bank_refresh_backlog;
   // Keeping track of which subarray to refresh next
-  vector<vector<int>> subarray_ref_counters;
+  std::vector<std::vector<int>> subarray_ref_counters;
   int max_sa_count = 0;
   // As defined in the standards
   int backlog_max = 8;
@@ -97,7 +96,7 @@ private:
   // Refresh based on the specified address
   void refresh_target(Controller<T>* ctrl, int rank, int bank, int sa)
   {
-    vector<int> addr_vec(int(T::Level::MAX), -1);
+    std::vector<int> addr_vec(int(T::Level::MAX), -1);
     addr_vec[0] = ctrl->channel->id;
     addr_vec[1] = rank;
     addr_vec[2] = bank;

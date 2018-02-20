@@ -33,12 +33,12 @@ void MemoryFactory<HBM>::validate(int channels, int ranks, const Config& configs
 
 template <>
 MemoryBase *MemoryFactory<WideIO2>::create(const Config& configs, int cacheline) {
-    int channels = stoi(configs["channels"], NULL, 0);
-    int ranks = stoi(configs["ranks"], NULL, 0);
+    int channels = std::stoi(configs["channels"], NULL, 0);
+    int ranks = std::stoi(configs["ranks"], NULL, 0);
     validate(channels, ranks, configs);
 
-    const string& org_name = configs["org"];
-    const string& speed_name = configs["speed"];
+    const std::string& org_name = configs["org"];
+    const std::string& speed_name = configs["speed"];
 
     WideIO2 *spec = new WideIO2(org_name, speed_name, channels);
 
@@ -50,14 +50,14 @@ MemoryBase *MemoryFactory<WideIO2>::create(const Config& configs, int cacheline)
 
 template <>
 MemoryBase *MemoryFactory<SALP>::create(const Config& configs, int cacheline) {
-    int channels = stoi(configs["channels"], NULL, 0);
-    int ranks = stoi(configs["ranks"], NULL, 0);
-    int subarrays = stoi(configs["subarrays"], NULL, 0);
+    int channels = std::stoi(configs["channels"], NULL, 0);
+    int ranks = std::stoi(configs["ranks"], NULL, 0);
+    int subarrays = std::stoi(configs["subarrays"], NULL, 0);
     validate(channels, ranks, configs);
 
-    const string& std_name = configs["standard"];
-    const string& org_name = configs["org"];
-    const string& speed_name = configs["speed"];
+    const std::string& std_name = configs["standard"];
+    const std::string& org_name = configs["org"];
+    const std::string& speed_name = configs["speed"];
 
     SALP *spec = new SALP(org_name, speed_name, std_name, subarrays);
 
@@ -68,7 +68,7 @@ MemoryBase *MemoryFactory<SALP>::create(const Config& configs, int cacheline) {
 
 }
 
-// This function can be used by autoconf AC_CHECK_LIB since
+// This std::function can be used by autoconf AC_CHECK_LIB since
 // apparently it can't detect C++ functions.
 // Basically just an entry in the symbol table
 extern "C"

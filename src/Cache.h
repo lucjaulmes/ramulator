@@ -124,7 +124,7 @@ protected:
       std::list<Line>::iterator victim);
 
   // First test whether need eviction, if so, do eviction by
-  // calling evict function. Then allocate a new line and return
+  // calling evict std::function. Then allocate a new line and return
   // the iterator points to it.
   std::list<Line>::iterator allocate_line(
       std::list<Line>& lines, long addr);
@@ -156,7 +156,7 @@ protected:
       return true;
     } else {
       auto& lines = it->second;
-      auto line = find_if(lines.begin(), lines.end(),
+      auto line = std::find_if(lines.begin(), lines.end(),
           [addr, this](Line l){return (l.tag == get_tag(addr));});
       if (line == lines.end()) {
         return true;
@@ -178,7 +178,7 @@ protected:
   std::vector<std::pair<long, std::list<Line>::iterator>>::iterator
   hit_mshr(long addr) {
     auto mshr_it =
-        find_if(mshr_entries.begin(), mshr_entries.end(),
+        std::find_if(mshr_entries.begin(), mshr_entries.end(),
             [addr, this](std::pair<long, std::list<Line>::iterator>
                    mshr_entry) {
               return (align(mshr_entry.first) == align(addr));
@@ -189,7 +189,7 @@ protected:
   std::list<Line>& get_lines(long addr) {
     if (cache_lines.find(get_index(addr))
         == cache_lines.end()) {
-      cache_lines.insert(make_pair(get_index(addr),
+      cache_lines.insert(std::make_pair(get_index(addr),
           std::list<Line>()));
     }
     return cache_lines[get_index(addr)];
@@ -219,12 +219,12 @@ public:
     }
 
   // wait_list contains miss requests with their latencies in
-  // cache. When this latency is met, the send_memory function
+  // cache. When this latency is met, the send_memory std::function
   // will be called to send the request to the memory system.
   std::list<std::pair<long, Request> > wait_list;
 
   // hit_list contains hit requests with their latencies in cache.
-  // callback function will be called when this latency is met and
+  // callback std::function will be called when this latency is met and
   // set the instruction status to ready in processor's window.
   std::list<std::pair<long, Request> > hit_list;
 

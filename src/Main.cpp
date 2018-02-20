@@ -29,7 +29,6 @@
 #include "STTMRAM.h"
 #include "PCM.h"
 
-using namespace std;
 using namespace ramulator;
 
 bool ramulator::warmup_complete = false;
@@ -45,7 +44,7 @@ void run_dramtrace(const Config& configs, Memory<T, Controller>& memory, const c
     int reads = 0, writes = 0, clks = 0;
     long addr = 0;
     Request::Type type = Request::Type::READ;
-    map<int, int> latencies;
+    std::map<int, int> latencies;
     auto read_complete = [&latencies](Request& r){latencies[r.depart - r.arrive]++;};
 
     Request req(addr, type, read_complete);
@@ -84,7 +83,7 @@ void run_cputrace(const Config& configs, Memory<T, Controller>& memory, const st
 {
     int cpu_tick = configs.get_cpu_tick();
     int mem_tick = configs.get_mem_tick();
-    auto send = bind(&Memory<T, Controller>::send, &memory, placeholders::_1);
+    auto send = std::bind(&Memory<T, Controller>::send, &memory, std::placeholders::_1);
     Processor proc(configs, files, send, memory);
 
     long warmup_insts = configs.get_warmup_insts();
@@ -151,7 +150,7 @@ void run_cputrace(const Config& configs, Memory<T, Controller>& memory, const st
 }
 
 template<typename T>
-void start_run(const Config& configs, T* spec, const vector<const char*>& files) {
+void start_run(const Config& configs, T* spec, const std::vector<const char*>& files) {
   // initiate controller and memory
   int C = configs.get_channels(), R = configs.get_ranks();
   // Check and Set channel, rank number
@@ -200,14 +199,14 @@ int main(int argc, const char *argv[])
     }
 
     int trace_start = 3;
-    string stats_out;
+    std::string stats_out;
     if (strcmp(argv[trace_start], "--stats") == 0) {
       Stats::statlist.output(argv[trace_start+1]);
       stats_out = argv[trace_start+1];
       trace_start += 2;
     } else {
       Stats::statlist.output(standard+".stats");
-      stats_out = standard + string(".stats");
+      stats_out = standard + std::string(".stats");
     }
 
     // A separate file defines mapping for easy config.

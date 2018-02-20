@@ -5,19 +5,18 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string HBM::standard_name = "HBM";
-string HBM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
+std::string HBM::standard_name = "HBM";
+std::string HBM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Bg", "Ba", "Ro", "Co"};
 
-map<string, enum HBM::Org> HBM::org_map = {
+std::map<std::string, enum HBM::Org> HBM::org_map = {
     {"HBM_1Gb", HBM::Org::HBM_1Gb},
     {"HBM_2Gb", HBM::Org::HBM_2Gb},
     {"HBM_4Gb", HBM::Org::HBM_4Gb},
 };
 
-map<string, enum HBM::Speed> HBM::speed_map = {
+std::map<std::string, enum HBM::Speed> HBM::speed_map = {
     {"HBM_1Gbps", HBM::Speed::HBM_1Gbps},
 };
 
@@ -28,13 +27,13 @@ HBM::HBM(Org org, Speed speed)
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-HBM::HBM(const string& org_str, const string& speed_str) :
+HBM::HBM(const std::string& org_str, const std::string& speed_str) :
     HBM(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -214,7 +213,7 @@ void HBM::init_lambda()
 void HBM::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

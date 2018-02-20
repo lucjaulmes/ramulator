@@ -14,7 +14,6 @@
 #include <utility>
 #include <queue>
 
-using namespace std;
 
 namespace ramulator
 {
@@ -36,8 +35,8 @@ private:
     };
 public:
     /* Command trace for DRAMPower 3.1 */
-    string cmd_trace_prefix = "cmd-trace-";
-    vector<ofstream> cmd_trace_files;
+    std::string cmd_trace_prefix = "cmd-trace-";
+    std::vector<std::ofstream> cmd_trace_files;
     bool record_cmd_trace = false;
     /* Commands to stdout */
     bool print_cmd_trace = false;
@@ -50,14 +49,14 @@ public:
     double write_low = 0.5;
 
     // request, first command, earliest clk
-    typedef tuple<Request, typename T::Command, long> request_info;
-    typedef vector<request_info> request_queue;
+    typedef std::tuple<Request, typename T::Command, long> request_info;
+    typedef std::vector<request_info> request_queue;
     request_queue readq;   // queue for read requests
     request_queue writeq;  // queue for write requests
     request_queue otherq;  // queue for all "other" requests (e.g., refresh)
 
     // read requests that are about to receive data from DRAM
-    priority_queue<Request, vector<Request>, compair_depart_clk> pending;
+    std::priority_queue<Request, std::vector<Request>, compair_depart_clk> pending;
 
     bool write_mode = false;  // whether write requests should be prioritized over reads
     long refreshed = 0;  // last time refresh requests were generated
@@ -69,10 +68,10 @@ public:
         record_cmd_trace = configs.record_cmd_trace();
         print_cmd_trace = configs.print_cmd_trace();
         if (record_cmd_trace){
-            string prefix = cmd_trace_prefix + "chan-" + to_string(channel->id) + "-rank-";
-            string suffix = ".cmdtrace";
+            std::string prefix = cmd_trace_prefix + "chan-" + std::to_string(channel->id) + "-rank-";
+            std::string suffix = ".cmdtrace";
             for (unsigned int i = 0; i < channel->children.size(); i++)
-                cmd_trace_files.emplace_back(prefix + to_string(i) + suffix);
+                cmd_trace_files.emplace_back(prefix + std::to_string(i) + suffix);
         }
         readq.reserve(queue_capacity);
         writeq.reserve(queue_capacity);
@@ -81,12 +80,12 @@ public:
         // regStats
 
         row_hits
-            .name("row_hits_channel_"+to_string(channel->id))
+            .name("row_hits_channel_"+std::to_string(channel->id))
             .desc("Number of row hits")
             .precision(0)
             ;
         row_misses
-            .name("row_misses_channel_"+to_string(channel->id))
+            .name("row_misses_channel_"+std::to_string(channel->id))
             .desc("Number of row misses")
             .precision(0)
             ;
@@ -101,7 +100,7 @@ public:
     /* Member Functions */
 
     void finish(int read_req, int write_req, int dram_cycles) {
-      // call finish function of each channel
+      // call finish std::function of each channel
       channel->finish(dram_cycles);
     }
 
@@ -117,7 +116,7 @@ public:
         req.arrive = clk;
         if (req.type == Request::Type::READ){
             for (auto& info : writeq)
-                if (req.addr == get<0>(info).addr){
+                if (req.addr == std::get<0>(info).addr){
                     req.depart = clk + 1;
                     pending.push(req);
                     return true;
@@ -148,7 +147,7 @@ public:
         int refresh_interval = channel->spec->speed_entry.nREFI;
         if (clk - refreshed >= refresh_interval) {
             auto req_type = Request::Type::REFRESH;
-            vector<int> addr_vec(int(T::Level::MAX), -1);
+            std::vector<int> addr_vec(int(T::Level::MAX), -1);
             addr_vec[0] = channel->id;
             for (auto child : channel->children) {
                 addr_vec[1] = child->id;
@@ -187,7 +186,7 @@ public:
 private:
 
     static bool compair_first_clk(const request_info& lhs, const request_info& rhs) {
-        return (get<2>(lhs) > get<2>(rhs));
+        return (std::get<2>(lhs) > std::get<2>(rhs));
     }
 
     typename T::Command get_first_cmd(Request& req)
@@ -211,17 +210,17 @@ private:
         }
         // return channel->decode(cmd, req.addr_vec.data());
     }
-    void update(typename T::Command cmd, bool state_change, vector<int>::iterator& begin, vector<int>::iterator& end, request_queue& q){
+    void update(typename T::Command cmd, bool state_change, std::vector<int>::iterator& begin, std::vector<int>::iterator& end, request_queue& q){
         if (q.empty()) return;
 
         for (auto& info : q) {
-            bool addr_eq = equal(begin, end, get<0>(info).addr_vec.begin());
+            bool addr_eq = equal(begin, end, std::get<0>(info).addr_vec.begin());
             if (state_change && addr_eq)
-                get<1>(info) = get_first_cmd(get<0>(info));
+                std::get<1>(info) = get_first_cmd(std::get<0>(info));
             if ((cmd == T::Command::RD || cmd == T::Command::WR)
-                && get<1>(info) == T::Command::ACT)
+                && std::get<1>(info) == T::Command::ACT)
                 continue;
-            get<2>(info) = channel->get_next(get<1>(info), get<0>(info).addr_vec.data());
+            std::get<2>(info) = channel->get_next(std::get<1>(info), std::get<0>(info).addr_vec.data());
         }
         make_heap(q.begin(), q.end(), compair_first_clk);
     }
@@ -229,9 +228,9 @@ private:
     void schedule(request_queue& q){
         if (q.empty()) return;
 
-        Request& req = get<0>(q[0]);
-        typename T::Command& first_cmd = get<1>(q[0]);
-        long first_clk = get<2>(q[0]);
+        Request& req = std::get<0>(q[0]);
+        typename T::Command& first_cmd = std::get<1>(q[0]);
+        long first_clk = std::get<2>(q[0]);
 
         if (first_clk > clk) return;
 
@@ -277,17 +276,17 @@ private:
         if (record_cmd_trace){
             // select rank
             auto& file = cmd_trace_files[addr_vec[1]];
-            string& cmd_name = channel->spec->command_name[int(cmd)];
+            std::string& cmd_name = channel->spec->command_name[int(cmd)];
             file<<clk<<','<<cmd_name;
             // TODO bad coding here
             if (cmd_name == "PREA" || cmd_name == "REF")
-                file<<endl;
+                file<<std::endl;
             else {
                 int bank_id = addr_vec[int(T::Level::Bank)];
                 if (channel->spec->standard_name == "DDR4" || channel->spec->standard_name == "GDDR5")
                     bank_id += addr_vec[int(T::Level::Bank) - 1] *
                         channel->spec->org_entry.count[int(T::Level::Bank)];
-                file<<','<<bank_id<<endl;
+                file<<','<<bank_id<<std::endl;
             }
         }
         if (print_cmd_trace){

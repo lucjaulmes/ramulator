@@ -1,12 +1,11 @@
 #include "Processor.h"
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
 Processor::Processor(const Config& configs,
-    vector<const char*> trace_list,
-    function<bool(Request)> send_memory,
+    std::vector<const char*> trace_list,
+    std::function<bool(Request)> send_memory,
     MemoryBase& memory)
     : ipcs(trace_list.size(), -1),
     early_exit(configs.is_early_exit()),
@@ -39,7 +38,7 @@ Processor::Processor(const Config& configs,
   }
   for (int i = 0 ; i < tracenum ; ++i) {
     cores[i]->callback = std::bind(&Processor::receive, this,
-        placeholders::_1);
+        std::placeholders::_1);
   }
 
   // regStats
@@ -137,7 +136,7 @@ void Processor::reset_stats() {
 }
 
 Core::Core(const Config& configs, int coreid,
-    const char* trace_fname, function<bool(Request)> send_next,
+    const char* trace_fname, std::function<bool(Request)> send_next,
     Cache* llc, std::shared_ptr<CacheSystem> cachesys, MemoryBase& memory)
     : id(coreid), no_core_caches(!configs.has_core_caches()),
     no_shared_cache(!configs.has_l3_cache()),
@@ -159,7 +158,7 @@ Core::Core(const Config& configs, int coreid,
     caches.emplace_back(new Cache(
         l1_size, l1_assoc, l1_blocksz, l1_mshr_num,
         Cache::Level::L1, cachesys));
-    send = bind(&Cache::send, caches[1].get(), placeholders::_1);
+    send = std::bind(&Cache::send, caches[1].get(), std::placeholders::_1);
     if (llc != nullptr) {
       caches[0]->concatlower(llc);
     }
@@ -179,22 +178,22 @@ Core::Core(const Config& configs, int coreid,
 
   
   // regStats
-  record_cycs.name("record_cycs_core_" + to_string(id))
+  record_cycs.name("record_cycs_core_" + std::to_string(id))
              .desc("Record cycle number for calculating weighted speedup. (Only valid when expected limit instruction number is non zero in config file.)")
              .precision(0)
              ;
 
-  record_insts.name("record_insts_core_" + to_string(id))
+  record_insts.name("record_insts_core_" + std::to_string(id))
               .desc("Retired instruction number when record cycle number. (Only valid when expected limit instruction number is non zero in config file.)")
               .precision(0)
               ;
 
-  memory_access_cycles.name("memory_access_cycles_core_" + to_string(id))
+  memory_access_cycles.name("memory_access_cycles_core_" + std::to_string(id))
                       .desc("memory access cycles in memory time domain")
                       .precision(0)
                       ;
   memory_access_cycles = 0;
-  cpu_inst.name("cpu_instructions_core_" + to_string(id))
+  cpu_inst.name("cpu_instructions_core_" + std::to_string(id))
           .desc("cpu instruction number")
           .precision(0)
           ;
@@ -306,7 +305,7 @@ void Core::receive(Request& req)
 {
     window.set_ready(req.addr, ~(l1_blocksz - 1l));
     if (req.arrive != -1 && req.depart > last) {
-      memory_access_cycles += (req.depart - max(last, req.arrive));
+      memory_access_cycles += (req.depart - std::max(last, req.arrive));
       last = req.depart;
     }
 }
@@ -384,12 +383,12 @@ Trace::Trace(const char* trace_fname) : file(trace_fname), trace_name(trace_fnam
 
 bool Trace::get_unfiltered_request(long& bubble_cnt, long& req_addr, Request::Type& req_type)
 {
-    string line;
-    getline(file, line);
+    std::string line;
+    std::getline(file, line);
     if (file.eof()) {
       file.clear();
       file.seekg(0, file.beg);
-      getline(file, line);
+      std::getline(file, line);
       //return false;
     }
     size_t pos, end;
@@ -399,7 +398,7 @@ bool Trace::get_unfiltered_request(long& bubble_cnt, long& req_addr, Request::Ty
 
     pos = line.find_first_not_of(' ', pos+end);
 
-    if (pos == string::npos || line.substr(pos)[0] == 'R')
+    if (pos == std::string::npos || line.substr(pos)[0] == 'R')
         req_type = Request::Type::READ;
     else if (line.substr(pos)[0] == 'W')
         req_type = Request::Type::WRITE;
@@ -419,8 +418,8 @@ bool Trace::get_filtered_request(long& bubble_cnt, long& req_addr, Request::Type
         has_write = false;
         return true;
     }
-    string line;
-    getline(file, line);
+    std::string line;
+    std::getline(file, line);
     line_num ++;
     if (file.eof() || line.size() == 0) {
         file.clear();
@@ -432,7 +431,7 @@ bool Trace::get_filtered_request(long& bubble_cnt, long& req_addr, Request::Type
             return false;
         }
         else { // starting over the input trace file
-            getline(file, line);
+            std::getline(file, line);
             line_num++;
         }
     }
@@ -445,7 +444,7 @@ bool Trace::get_filtered_request(long& bubble_cnt, long& req_addr, Request::Type
     req_type = Request::Type::READ;
 
     pos = line.find_first_not_of(' ', pos+end);
-    if (pos != string::npos){
+    if (pos != std::string::npos){
         has_write = true;
         write_addr = stoul(line.substr(pos), NULL, 0);
     }
@@ -454,8 +453,8 @@ bool Trace::get_filtered_request(long& bubble_cnt, long& req_addr, Request::Type
 
 bool Trace::get_dramtrace_request(long& req_addr, Request::Type& req_type)
 {
-    string line;
-    getline(file, line);
+    std::string line;
+    std::getline(file, line);
     if (file.eof()) {
         return false;
     }
@@ -464,7 +463,7 @@ bool Trace::get_dramtrace_request(long& req_addr, Request::Type& req_type)
 
     pos = line.find_first_not_of(' ', pos+1);
 
-    if (pos == string::npos || line.substr(pos)[0] == 'R')
+    if (pos == std::string::npos || line.substr(pos)[0] == 'R')
         req_type = Request::Type::READ;
     else if (line.substr(pos)[0] == 'W')
         req_type = Request::Type::WRITE;

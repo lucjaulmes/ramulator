@@ -6,13 +6,12 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string ALDRAM::standard_name = "ALDRAM";
-string ALDRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string ALDRAM::standard_name = "ALDRAM";
+std::string ALDRAM::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum ALDRAM::Org> ALDRAM::org_map = {
+std::map<std::string, enum ALDRAM::Org> ALDRAM::org_map = {
     {"ALDRAM_512Mb_x4", ALDRAM::Org::ALDRAM_512Mb_x4}, {"ALDRAM_512Mb_x8", ALDRAM::Org::ALDRAM_512Mb_x8}, {"ALDRAM_512Mb_x16", ALDRAM::Org::ALDRAM_512Mb_x16},
     {"ALDRAM_1Gb_x4", ALDRAM::Org::ALDRAM_1Gb_x4}, {"ALDRAM_1Gb_x8", ALDRAM::Org::ALDRAM_1Gb_x8}, {"ALDRAM_1Gb_x16", ALDRAM::Org::ALDRAM_1Gb_x16},
     {"ALDRAM_2Gb_x4", ALDRAM::Org::ALDRAM_2Gb_x4}, {"ALDRAM_2Gb_x8", ALDRAM::Org::ALDRAM_2Gb_x8}, {"ALDRAM_2Gb_x16", ALDRAM::Org::ALDRAM_2Gb_x16},
@@ -20,7 +19,7 @@ map<string, enum ALDRAM::Org> ALDRAM::org_map = {
     {"ALDRAM_8Gb_x4", ALDRAM::Org::ALDRAM_8Gb_x4}, {"ALDRAM_8Gb_x8", ALDRAM::Org::ALDRAM_8Gb_x8}, {"ALDRAM_8Gb_x16", ALDRAM::Org::ALDRAM_8Gb_x16},
 };
 
-map<string, enum ALDRAM::Speed> ALDRAM::speed_map = {
+std::map<std::string, enum ALDRAM::Speed> ALDRAM::speed_map = {
     {"ALDRAM_800D", ALDRAM::Speed::ALDRAM_800D}, {"ALDRAM_800E", ALDRAM::Speed::ALDRAM_800E},
     {"ALDRAM_1066E", ALDRAM::Speed::ALDRAM_1066E}, {"ALDRAM_1066F", ALDRAM::Speed::ALDRAM_1066F}, {"ALDRAM_1066G", ALDRAM::Speed::ALDRAM_1066G},
     {"ALDRAM_1333G", ALDRAM::Speed::ALDRAM_1333G}, {"ALDRAM_1333H", ALDRAM::Speed::ALDRAM_1333H},
@@ -38,13 +37,13 @@ ALDRAM::ALDRAM(Org org, Speed speed) :
     current_speed = speed;
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_lambda();
     init_timing(speed_table[int(Temp::HOT)][int(speed)]);
     temperature = Temp::COLD;
 }
 
-ALDRAM::ALDRAM(const string& org_str, const string& speed_str) :
+ALDRAM::ALDRAM(const std::string& org_str, const std::string& speed_str) :
     ALDRAM(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -68,9 +67,9 @@ void ALDRAM::aldram_timing(Temp current_temperature)
     read_latency = speed_entry.nCL + speed_entry.nBL;
     init_timing(speed_table[int(temperature)][int(current_speed)]);
 
-    //std::cout << "vector size: " << timing[int(Temp::HOT)][int(current_speed)].size() << endl;
+    //std::cout << "std::vector size: " << timing[int(Temp::HOT)][int(current_speed)].size() << std::endl;
     //std::cout << "after cold nRCD : ";
-    //std::cout << int(timing[int(Level::Bank)][int(Command::ACT)][0].val) << endl << endl;
+    //std::cout << int(timing[int(Level::Bank)][int(Command::ACT)][0].val) << std::endl << std::endl;
 }
 
 void ALDRAM::init_speed()
@@ -225,7 +224,7 @@ void ALDRAM::init_lambda()
 void ALDRAM::init_timing(SpeedEntry speed_entry)
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];

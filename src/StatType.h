@@ -336,14 +336,14 @@ class VectorBase: public Stat<Derived> {
     }
   }
   size_type size() const {return _size;}
-  // Copy the values to a local vector and return a reference to it.
+  // Copy the values to a local std::vector and return a reference to it.
   void value(VCounter& vec) const {
     vec.resize(size());
     for (off_type i = 0 ; i < size() ; ++i) {
       vec[i] = data[i].value();
     }
   }
-  // Copy the results to a local vector and return a reference to it.
+  // Copy the results to a local std::vector and return a reference to it.
   void result(VResult& vec) const {
     vec.resize(size());
     for (off_type i = 0 ; i < size() ; ++i) {

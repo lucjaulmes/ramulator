@@ -14,7 +14,6 @@
 #include "DRAM.h"
 #include "DSARP.h"
 
-using namespace std;
 using namespace ramulator;
 
 namespace ramulator {
@@ -30,8 +29,8 @@ Refresh<DSARP>::Refresh(Controller<DSARP>* ctrl) : ctrl(ctrl) {
   // Init refresh counters
   for (int r = 0; r < max_rank_count; r++) {
     bank_ref_counters.push_back(0);
-    bank_refresh_backlog.push_back(new vector<int>(max_bank_count, 0));
-    vector<int> sa_counters(ctrl->channel->spec->org_entry.count[(int)DSARP::Level::SubArray], 0);
+    bank_refresh_backlog.push_back(new std::vector<int>(max_bank_count, 0));
+    std::vector<int> sa_counters(ctrl->channel->spec->org_entry.count[(int)DSARP::Level::SubArray], 0);
     subarray_ref_counters.push_back(sa_counters);
   }
 
@@ -48,7 +47,7 @@ void Refresh<DSARP>::early_inject_refresh() {
     return;
 
   // OoO bank-level refresh
-  vector<bool> is_bank_occupied(max_rank_count * max_bank_count, false);
+  std::vector<bool> is_bank_occupied(max_rank_count * max_bank_count, false);
   Controller<DSARP>::Queue& rdq = ctrl->readq;
 
   // Figure out which banks are idle in order to refresh one of them
@@ -153,7 +152,7 @@ void Refresh<DSARP>::inject_refresh(bool b_ref_rank) {
 }
 
 // first = wrq.count; second = bank idx
-typedef pair<int, int> wrq_idx;
+typedef std::pair<int, int> wrq_idx;
 bool wrq_comp (wrq_idx l, wrq_idx r)
 {
   return l.first < r.first;
@@ -176,7 +175,7 @@ void Refresh<DSARP>::wrp() {
       continue;
 
     // Find the bank with the lowest number of writes+reads
-    vector<wrq_idx> sorted_bank_demand;
+    std::vector<wrq_idx> sorted_bank_demand;
     for (int b = 0; b < max_bank_count; b++)
       sorted_bank_demand.push_back(wrq_idx(0,b));
     // Filter out all the writes to this rank

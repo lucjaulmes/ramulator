@@ -20,7 +20,6 @@
 #include "SALP.h"
 #include "TLDRAM.h"
 
-using namespace std;
 
 namespace ramulator
 {
@@ -76,7 +75,7 @@ public:
     Refresh<T>* refresh;
 
     struct Queue {
-        list<Request> q;
+        std::list<Request> q;
         unsigned int max = 32;
         unsigned int size() {return q.size();}
     };
@@ -90,15 +89,15 @@ public:
                    // after ACTIVATE w/o READ of WRITE command)
     Queue otherq;  // queue for all "other" requests (e.g., refresh)
 
-    deque<Request> pending;  // read requests that are about to receive data from DRAM
+    std::deque<Request> pending;  // read requests that are about to receive data from DRAM
     bool write_mode = false;  // whether write requests should be prioritized over reads
     float wr_high_watermark = 0.8f; // threshold for switching to write mode
     float wr_low_watermark = 0.2f; // threshold for switching back to read mode
     //long refreshed = 0;  // last time refresh requests were generated
 
     /* Command trace for DRAMPower 3.1 */
-    string cmd_trace_prefix = "cmd-trace-";
-    vector<ofstream> cmd_trace_files;
+    std::string cmd_trace_prefix = "cmd-trace-";
+    std::vector<std::ofstream> cmd_trace_files;
     bool record_cmd_trace = false;
     /* Commands to stdout */
     bool print_cmd_trace = false;
@@ -118,125 +117,125 @@ public:
             if (configs["cmd_trace_prefix"] != "") {
               cmd_trace_prefix = configs["cmd_trace_prefix"];
             }
-            string prefix = cmd_trace_prefix + "chan-" + to_string(channel->id) + "-rank-";
-            string suffix = ".cmdtrace";
+            std::string prefix = cmd_trace_prefix + "chan-" + std::to_string(channel->id) + "-rank-";
+            std::string suffix = ".cmdtrace";
             for (unsigned int i = 0; i < channel->children.size(); i++)
-                cmd_trace_files[i].open(prefix + to_string(i) + suffix);
+                cmd_trace_files[i].open(prefix + std::to_string(i) + suffix);
         }
 
         // regStats
 
         row_hits
-            .name("row_hits_channel_"+to_string(channel->id) + "_core")
+            .name("row_hits_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row hits per channel per core")
             .precision(0)
             ;
         row_misses
-            .name("row_misses_channel_"+to_string(channel->id) + "_core")
+            .name("row_misses_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row misses per channel per core")
             .precision(0)
             ;
         row_conflicts
-            .name("row_conflicts_channel_"+to_string(channel->id) + "_core")
+            .name("row_conflicts_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row conflicts per channel per core")
             .precision(0)
             ;
 
         read_row_hits
             .init(configs.get_core_num())
-            .name("read_row_hits_channel_"+to_string(channel->id) + "_core")
+            .name("read_row_hits_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row hits for read requests per channel per core")
             .precision(0)
             ;
         read_row_misses
             .init(configs.get_core_num())
-            .name("read_row_misses_channel_"+to_string(channel->id) + "_core")
+            .name("read_row_misses_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row misses for read requests per channel per core")
             .precision(0)
             ;
         read_row_conflicts
             .init(configs.get_core_num())
-            .name("read_row_conflicts_channel_"+to_string(channel->id) + "_core")
+            .name("read_row_conflicts_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row conflicts for read requests per channel per core")
             .precision(0)
             ;
 
         write_row_hits
             .init(configs.get_core_num())
-            .name("write_row_hits_channel_"+to_string(channel->id) + "_core")
+            .name("write_row_hits_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row hits for write requests per channel per core")
             .precision(0)
             ;
         write_row_misses
             .init(configs.get_core_num())
-            .name("write_row_misses_channel_"+to_string(channel->id) + "_core")
+            .name("write_row_misses_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row misses for write requests per channel per core")
             .precision(0)
             ;
         write_row_conflicts
             .init(configs.get_core_num())
-            .name("write_row_conflicts_channel_"+to_string(channel->id) + "_core")
+            .name("write_row_conflicts_channel_"+std::to_string(channel->id) + "_core")
             .desc("Number of row conflicts for write requests per channel per core")
             .precision(0)
             ;
 
         useless_activates
-            .name("useless_activates_"+to_string(channel->id)+ "_core")
+            .name("useless_activates_"+std::to_string(channel->id)+ "_core")
             .desc("Number of useless activations. E.g, ACT -> PRE w/o RD or WR")
             .precision(0)
             ;
 
         read_transaction_bytes
-            .name("read_transaction_bytes_"+to_string(channel->id))
+            .name("read_transaction_bytes_"+std::to_string(channel->id))
             .desc("The total byte of read transaction per channel")
             .precision(0)
             ;
         write_transaction_bytes
-            .name("write_transaction_bytes_"+to_string(channel->id))
+            .name("write_transaction_bytes_"+std::to_string(channel->id))
             .desc("The total byte of write transaction per channel")
             .precision(0)
             ;
 
         read_latency_sum
-            .name("read_latency_sum_"+to_string(channel->id))
+            .name("read_latency_sum_"+std::to_string(channel->id))
             .desc("The memory latency cycles (in memory time domain) sum for all read requests in this channel")
             .precision(0)
             ;
         read_latency_avg
-            .name("read_latency_avg_"+to_string(channel->id))
+            .name("read_latency_avg_"+std::to_string(channel->id))
             .desc("The average memory latency cycles (in memory time domain) per request for all read requests in this channel")
             .precision(6)
             ;
 
         req_queue_length_sum
-            .name("req_queue_length_sum_"+to_string(channel->id))
+            .name("req_queue_length_sum_"+std::to_string(channel->id))
             .desc("Sum of read and write queue length per memory cycle per channel.")
             .precision(0)
             ;
         req_queue_length_avg
-            .name("req_queue_length_avg_"+to_string(channel->id))
+            .name("req_queue_length_avg_"+std::to_string(channel->id))
             .desc("Average of read and write queue length per memory cycle per channel.")
             .precision(6)
             ;
 
         read_req_queue_length_sum
-            .name("read_req_queue_length_sum_"+to_string(channel->id))
+            .name("read_req_queue_length_sum_"+std::to_string(channel->id))
             .desc("Read queue length sum per memory cycle per channel.")
             .precision(0)
             ;
         read_req_queue_length_avg
-            .name("read_req_queue_length_avg_"+to_string(channel->id))
+            .name("read_req_queue_length_avg_"+std::to_string(channel->id))
             .desc("Read queue length average per memory cycle per channel.")
             .precision(6)
             ;
 
         write_req_queue_length_sum
-            .name("write_req_queue_length_sum_"+to_string(channel->id))
+            .name("write_req_queue_length_sum_"+std::to_string(channel->id))
             .desc("Write queue length sum per memory cycle per channel.")
             .precision(0)
             ;
         write_req_queue_length_avg
-            .name("write_req_queue_length_avg_"+to_string(channel->id))
+            .name("write_req_queue_length_avg_"+std::to_string(channel->id))
             .desc("Write queue length average per memory cycle per channel.")
             .precision(6)
             ;
@@ -296,7 +295,7 @@ public:
       req_queue_length_avg = req_queue_length_sum.value() / dram_cycles;
       read_req_queue_length_avg = read_req_queue_length_sum.value() / dram_cycles;
       write_req_queue_length_avg = write_req_queue_length_sum.value() / dram_cycles;
-      // call finish function of each channel
+      // call finish std::function of each channel
       channel->finish(dram_cycles);
     }
 
@@ -320,7 +319,7 @@ public:
         queue.q.push_back(req);
         // shortcut for read requests, if a write to same addr exists
         // necessary for coherence
-        if (req.type == Request::Type::READ && find_if(writeq.q.begin(), writeq.q.end(),
+        if (req.type == Request::Type::READ && std::find_if(writeq.q.begin(), writeq.q.end(),
                 [req](Request& wreq){ return req.addr == wreq.addr;}) != writeq.q.end()){
             req.depart = clk + 1;
             pending.push_back(req);
@@ -384,7 +383,7 @@ public:
         if (req == queue->q.end() || !is_ready(req)) {
             // we couldn't find a command to schedule -- let's try to be speculative
             auto cmd = T::Command::PRE;
-            vector<int> victim = rowpolicy->get_victim(cmd);
+            std::vector<int> victim = rowpolicy->get_victim(cmd);
             if (!victim.empty()){
                 issue_cmd(cmd, victim);
             }
@@ -456,37 +455,37 @@ public:
         queue->q.erase(req);
     }
 
-    bool is_ready(list<Request>::iterator req)
+    bool is_ready(std::list<Request>::iterator req)
     {
         typename T::Command cmd = get_first_cmd(req);
         return channel->check(cmd, req->addr_vec.data(), clk);
     }
 
-    bool is_ready(typename T::Command cmd, const vector<int>& addr_vec)
+    bool is_ready(typename T::Command cmd, const std::vector<int>& addr_vec)
     {
         return channel->check(cmd, addr_vec.data(), clk);
     }
 
-    bool is_row_hit(list<Request>::iterator req)
+    bool is_row_hit(std::list<Request>::iterator req)
     {
         // cmd must be decided by the request type, not the first cmd
         typename T::Command cmd = channel->spec->translate[int(req->type)];
         return channel->check_row_hit(cmd, req->addr_vec.data());
     }
 
-    bool is_row_hit(typename T::Command cmd, const vector<int>& addr_vec)
+    bool is_row_hit(typename T::Command cmd, const std::vector<int>& addr_vec)
     {
         return channel->check_row_hit(cmd, addr_vec.data());
     }
 
-    bool is_row_open(list<Request>::iterator req)
+    bool is_row_open(std::list<Request>::iterator req)
     {
         // cmd must be decided by the request type, not the first cmd
         typename T::Command cmd = channel->spec->translate[int(req->type)];
         return channel->check_row_open(cmd, req->addr_vec.data());
     }
 
-    bool is_row_open(typename T::Command cmd, const vector<int>& addr_vec)
+    bool is_row_open(typename T::Command cmd, const std::vector<int>& addr_vec)
     {
         return channel->check_row_open(cmd, addr_vec.data());
     }
@@ -525,7 +524,7 @@ public:
     }
 
 private:
-    typename T::Command get_first_cmd(list<Request>::iterator req)
+    typename T::Command get_first_cmd(std::list<Request>::iterator req)
     {
         typename T::Command cmd = channel->spec->translate[int(req->type)];
         return channel->decode(cmd, req->addr_vec.data());
@@ -533,7 +532,7 @@ private:
 
     // upgrade to an autoprecharge command
     void cmd_issue_autoprecharge(typename T::Command& cmd,
-                                            const vector<int>& addr_vec) {
+                                            const std::vector<int>& addr_vec) {
 
         // currently, autoprecharge is only used with closed row policy
         if(channel->spec->is_accessing(cmd) && rowpolicy->type == RowPolicy<T>::Type::ClosedAP) {
@@ -541,14 +540,14 @@ private:
             Queue* queue = write_mode ? &writeq : &readq;
 
             auto begin = addr_vec.begin();
-            vector<int> rowgroup(begin, begin + int(T::Level::Row) + 1);
+            std::vector<int> rowgroup(begin, begin + int(T::Level::Row) + 1);
 
 			int num_row_hits = 0;
 
             for (auto itr = queue->q.begin(); itr != queue->q.end(); ++itr) {
                 if (is_row_hit(itr)) { 
                     auto begin2 = itr->addr_vec.begin();
-                    vector<int> rowgroup2(begin2, begin2 + int(T::Level::Row) + 1);
+                    std::vector<int> rowgroup2(begin2, begin2 + int(T::Level::Row) + 1);
                     if(rowgroup == rowgroup2)
                         num_row_hits++;
                 }
@@ -559,7 +558,7 @@ private:
                 for (auto itr = queue->q.begin(); itr != queue->q.end(); ++itr) {
                     if (is_row_hit(itr)) {
                         auto begin2 = itr->addr_vec.begin();
-                        vector<int> rowgroup2(begin2, begin2 + int(T::Level::Row) + 1);
+                        std::vector<int> rowgroup2(begin2, begin2 + int(T::Level::Row) + 1);
                         if(rowgroup == rowgroup2)
                             num_row_hits++;
                     }
@@ -581,7 +580,7 @@ private:
 
     }
 
-    void issue_cmd(typename T::Command cmd, const vector<int>& addr_vec)
+    void issue_cmd(typename T::Command cmd, const std::vector<int>& addr_vec)
     {
         cmd_issue_autoprecharge(cmd, addr_vec);
         assert(is_ready(cmd, addr_vec));
@@ -597,16 +596,16 @@ private:
         if (record_cmd_trace){
             // select rank
             auto& file = cmd_trace_files[addr_vec[1]];
-            string& cmd_name = channel->spec->command_name[int(cmd)];
+            std::string& cmd_name = channel->spec->command_name[int(cmd)];
             file<<clk<<','<<cmd_name;
             // TODO bad coding here
             if (cmd_name == "PREA" || cmd_name == "REF")
-                file<<endl;
+                file<<std::endl;
             else{
                 int bank_id = addr_vec[int(T::Level::Bank)];
                 if (channel->spec->standard_name == "DDR4" || channel->spec->standard_name == "GDDR5")
                     bank_id += addr_vec[int(T::Level::Bank) - 1] * channel->spec->org_entry.count[int(T::Level::Bank)];
-                file<<','<<bank_id<<endl;
+                file<<','<<bank_id<<std::endl;
             }
         }
         if (print_cmd_trace){
@@ -616,17 +615,17 @@ private:
             printf("\n");
         }
     }
-    vector<int> get_addr_vec(typename T::Command cmd, list<Request>::iterator req){
+    std::vector<int> get_addr_vec(typename T::Command cmd, std::list<Request>::iterator req){
         return req->addr_vec;
     }
 };
 
 template <>
-vector<int> Controller<SALP>::get_addr_vec(
-    SALP::Command cmd, list<Request>::iterator req);
+std::vector<int> Controller<SALP>::get_addr_vec(
+    SALP::Command cmd, std::list<Request>::iterator req);
 
 template <>
-bool Controller<SALP>::is_ready(list<Request>::iterator req);
+bool Controller<SALP>::is_ready(std::list<Request>::iterator req);
 
 template <>
 void Controller<ALDRAM>::update_temp(ALDRAM::Temp current_temperature);
@@ -636,7 +635,7 @@ void Controller<TLDRAM>::tick();
 
 template <>
 void Controller<TLDRAM>::cmd_issue_autoprecharge(typename TLDRAM::Command& cmd,
-                                                    const vector<int>& addr_vec);
+                                                    const std::vector<int>& addr_vec);
 
 } /*namespace ramulator*/
 

@@ -5,13 +5,12 @@
 #include <functional>
 #include <cassert>
 
-using namespace std;
 using namespace ramulator;
 
-string LPDDR3::standard_name = "LPDDR3";
-string LPDDR3::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
+std::string LPDDR3::standard_name = "LPDDR3";
+std::string LPDDR3::level_str [int(Level::MAX)] = {"Ch", "Ra", "Ba", "Ro", "Co"};
 
-map<string, enum LPDDR3::Org> LPDDR3::org_map = {
+std::map<std::string, enum LPDDR3::Org> LPDDR3::org_map = {
     {"LPDDR3_4Gb_x16", LPDDR3::Org::LPDDR3_4Gb_x16}, {"LPDDR3_4Gb_x32", LPDDR3::Org::LPDDR3_4Gb_x32},
     {"LPDDR3_6Gb_x16", LPDDR3::Org::LPDDR3_6Gb_x16}, {"LPDDR3_6Gb_x32", LPDDR3::Org::LPDDR3_6Gb_x32},
     {"LPDDR3_8Gb_x16", LPDDR3::Org::LPDDR3_8Gb_x16}, {"LPDDR3_8Gb_x32", LPDDR3::Org::LPDDR3_8Gb_x32},
@@ -19,7 +18,7 @@ map<string, enum LPDDR3::Org> LPDDR3::org_map = {
     {"LPDDR3_16Gb_x16", LPDDR3::Org::LPDDR3_16Gb_x16}, {"LPDDR3_16Gb_x32", LPDDR3::Org::LPDDR3_16Gb_x32},
 };
 
-map<string, enum LPDDR3::Speed> LPDDR3::speed_map = {
+std::map<std::string, enum LPDDR3::Speed> LPDDR3::speed_map = {
     {"LPDDR3_1333", LPDDR3::Speed::LPDDR3_1333},
     {"LPDDR3_1600", LPDDR3::Speed::LPDDR3_1600},
     {"LPDDR3_1866", LPDDR3::Speed::LPDDR3_1866},
@@ -33,13 +32,13 @@ LPDDR3::LPDDR3(Org org, Speed speed)
 {
     init_speed();
     init_prereq();
-    init_rowhit(); // SAUGATA: added row hit function
+    init_rowhit(); // SAUGATA: added row hit std::function
     init_rowopen();
     init_lambda();
     init_timing();
 }
 
-LPDDR3::LPDDR3(const string& org_str, const string& speed_str) :
+LPDDR3::LPDDR3(const std::string& org_str, const std::string& speed_str) :
     LPDDR3(org_map[org_str], speed_map[speed_str])
 {
 }
@@ -227,7 +226,7 @@ void LPDDR3::init_lambda()
 void LPDDR3::init_timing()
 {
     SpeedEntry& s = speed_entry;
-    vector<TimingEntry> *t;
+    std::vector<TimingEntry> *t;
 
     /*** Channel ***/
     t = timing[int(Level::Channel)];
