@@ -3,62 +3,73 @@
 using namespace std;
 using namespace ramulator;
 
-Config::Config(const std::string& fname) {
-  parse(fname);
+const string ramulator::Config::missing = "";
+
+Config::Config(const string &fname)
+{
+    parse(fname);
 }
 
-void Config::parse(const string& fname)
+void Config::add(const string &name, const string &value)
+{
+    if (contains(name))
+    {
+        std::cerr << "ramulator::Config::add options[" << name << "] already set.\n";
+        return;
+    }
+
+    options.insert(make_pair(name, value));
+
+    if (name == "channels")
+        channels = stoi(value);
+    else if (name == "ranks")
+        ranks = stoi(value);
+    else if (name == "subarrays")
+        subarrays = stoi(value);
+    else if (name == "cpu_tick")
+        cpu_tick = stoi(value);
+    else if (name == "mem_tick")
+        mem_tick = stoi(value);
+    else if (name == "expected_limit_insts")
+        expected_limit_insts = stol(value);
+    else if (name == "warmup_insts")
+        warmup_insts = stol(value);
+}
+
+void Config::parse(const string &fname)
 {
     ifstream file(fname);
-    assert(file.good() && "Bad config file");
+    if (!file.good()) {
+        std::cerr << "Bad config file \"" << fname << "\"\n";
+        std::exit(1);
+    }
+
     string line;
-    while (getline(file, line)) {
+    while (getline(file, line))
+    {
         char delim[] = " \t=";
         vector<string> tokens;
 
-        while (true) {
-            size_t start = line.find_first_not_of(delim);
-            if (start == string::npos) 
-                break;
-
-            size_t end = line.find_first_of(delim, start);
-            if (end == string::npos) {
-                tokens.push_back(line.substr(start));
-                break;
-            }
-
-            tokens.push_back(line.substr(start, end - start));
-            line = line.substr(end);
+        for (size_t start = line.find_first_not_of(delim), end; start != string::npos;
+                    start = line.find_first_not_of(delim, end))
+        {
+            end = line.find_first_of(delim, start);
+            tokens.push_back(line.substr(start, end));
         }
 
-        // empty line
-        if (!tokens.size())
+        // empty or comment line
+        if (!tokens.size() || tokens[0][0] == '#')
             continue;
 
-        // comment line
-        if (tokens[0][0] == '#')
-            continue;
-
-        // parameter line
-        assert(tokens.size() == 2 && "Only allow two tokens in one line");
-
-        options[tokens[0]] = tokens[1];
-
-        if (tokens[0] == "channels") {
-          channels = atoi(tokens[1].c_str());
-        } else if (tokens[0] == "ranks") {
-          ranks = atoi(tokens[1].c_str());
-        } else if (tokens[0] == "subarrays") {
-          subarrays = atoi(tokens[1].c_str());
-        } else if (tokens[0] == "cpu_tick") {
-          cpu_tick = atoi(tokens[1].c_str());
-        } else if (tokens[0] == "mem_tick") {
-          mem_tick = atoi(tokens[1].c_str());
-        } else if (tokens[0] == "expected_limit_insts") {
-          expected_limit_insts = atoi(tokens[1].c_str());
-        } else if (tokens[0] == "warmup_insts") {
-          warmup_insts = atoi(tokens[1].c_str());
+        // unexpected parameter line
+        else if (tokens.size() != 2) {
+            std::cerr << "Only allow two tokens in one line: " << line << '\n';
+            std::exit(2);
         }
+
+        // correct parameter line
+        else
+            add(tokens[0], tokens[1]);
     }
     file.close();
 }

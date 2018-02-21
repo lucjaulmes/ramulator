@@ -6,7 +6,8 @@
 #include <vector>
 #include <map>
 #include <iostream>
-#include <cassert>
+
+using namespace std;
 
 namespace ramulator
 {
@@ -14,7 +15,7 @@ namespace ramulator
 class Config {
 
 private:
-    std::map<std::string, std::string> options;
+    map<string, string> options;
     int channels;
     int ranks;
     int subarrays;
@@ -25,31 +26,24 @@ private:
     long warmup_insts = 0;
 
 public:
+    static const string missing;
+
     Config() {}
-    Config(const std::string& fname);
-    void parse(const std::string& fname);
-    std::string operator [] (const std::string& name) const {
-      if (options.find(name) != options.end()) {
-        return (options.find(name))->second;
-      } else {
-        return "";
-      }
+    Config(const string& fname);
+    void parse(const string& fname);
+    void add(const string& name, const string& value);
+
+    const string& operator [](const string& name) const {
+        auto it = options.find(name);
+        if (it != options.end()) {
+            return it->second;
+        } else {
+            return missing;
+        }
     }
 
-    bool contains(const std::string& name) const {
-      if (options.find(name) != options.end()) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    void add (const std::string& name, const std::string& value) {
-      if (!contains(name)) {
-        options.insert(make_pair(name, value));
-      } else {
-        printf("ramulator::Config::add options[%s] already set.\n", name.c_str());
-      }
+    bool contains(const string& name) const {
+        return options.find(name) != options.end();
     }
 
     void set_core_num(int _core_num) {core_num = _core_num;}
@@ -64,53 +58,35 @@ public:
     long get_warmup_insts() const {return warmup_insts;}
 
     bool has_l3_cache() const {
-      if (options.find("cache") != options.end()) {
-        const std::string& cache_option = (options.find("cache"))->second;
+        const string& cache_option = (*this)["cache"];
         return (cache_option == "all") || (cache_option == "L3");
-      } else {
-        return false;
-      }
     }
+
     bool has_core_caches() const {
-      if (options.find("cache") != options.end()) {
-        const std::string& cache_option = (options.find("cache"))->second;
+        const string& cache_option = (*this)["cache"];
         return (cache_option == "all" || cache_option == "L1L2");
-      } else {
-        return false;
-      }
     }
+
     bool is_early_exit() const {
-      // the default value is true
-      if (options.find("early_exit") != options.end()) {
-        if ((options.find("early_exit"))->second == "off") {
-          return false;
-        }
-        return true;
-      }
-      return true;
+        // the default value is true
+        const string& exit_option = (*this)["early_exit"];
+        return exit_option == "off";
     }
+
     bool calc_weighted_speedup() const {
-      return (expected_limit_insts != 0);
+        return (expected_limit_insts != 0);
     }
+
     bool record_cmd_trace() const {
-      // the default value is false
-      if (options.find("record_cmd_trace") != options.end()) {
-        if ((options.find("record_cmd_trace"))->second == "on") {
-          return true;
-        }
-        return false;
-      }
-      return false;
+        // the default value is false
+        const string& record_option = (*this)["record_cmd_trace"];
+        return record_option == "on";
     }
+
     bool print_cmd_trace() const {
-      // the default value is false
-      if (options.find("print_cmd_trace") != options.end()) {
-        if ((options.find("print_cmd_trace"))->second == "on") {
-          return true;
-        }
-        return false;
-      }
-      return false;
+        // the default value is false
+        const string& print_option = (*this)["print_cmd_trace"];
+        return print_option == "on";
     }
 };
 
