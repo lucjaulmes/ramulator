@@ -48,11 +48,14 @@ Current Row Policies:
 
 #include "DRAM.h"
 #include "Request.h"
+#include "Config.h"
 #include "Controller.h"
 #include <vector>
 #include <map>
+#include <string>
 #include <list>
 #include <functional>
+#include <algorithm>
 #include <cassert>
 
 using namespace std;
@@ -71,11 +74,25 @@ public:
 
     enum class Type {
         FCFS, FRFCFS, FRFCFS_Cap, FRFCFS_PriorHit, MAX
-    } type = Type::FRFCFS_Cap; //Change this line to change scheduling policy
+    } type = Type::FRFCFS_Cap;
 
     long cap = 16; //Change this line to change cap
 
-    Scheduler(Controller<T>* ctrl) : ctrl(ctrl) {}
+    Scheduler(Controller<T>* ctrl, std::string policy) : ctrl(ctrl)
+    {
+        std::transform(policy.begin(), policy.end(), policy.begin(), [](unsigned char c){ return std::tolower(c); });
+        if (policy == "fcfs") {
+            type = Type::FCFS;
+        } else if (policy == "frfcfs") {
+            type = Type::FRFCFS;
+        } else if (policy == "frfcfs_cap") {
+            type = Type::FRFCFS_Cap;
+        } else if (policy == "frfcfs_timeout") {
+            type = Type::FRFCFS_PriorHit;
+        } else if (policy != Config::missing) {
+            std::cerr << "Warning: unrecognized scheduler type \"" << policy << "\"\n";
+        }
+    }
 
     list<Request>::iterator get_head(list<Request>& q)
     {
@@ -220,7 +237,21 @@ public:
 
     int timeout = 50;
 
-    RowPolicy(Controller<T>* ctrl) : ctrl(ctrl) {}
+    RowPolicy(Controller<T>* ctrl, std::string policy) : ctrl(ctrl)
+    {
+        std::transform(policy.begin(), policy.end(), policy.begin(), [](unsigned char c){ return std::tolower(c); });
+        if (policy == "closed") {
+            type = Type::Closed;
+        } else if (policy == "closedap") {
+            type = Type::ClosedAP;
+        } else if (policy == "opened") {
+            type = Type::Opened;
+        } else if (policy == "timeout") {
+            type = Type::Timeout;
+        } else if (policy != Config::missing) {
+            std::cerr << "Warning: unrecognized row policy \"" << policy << "\"\n";
+        }
+    }
 
     vector<int> get_victim(typename T::Command cmd)
     {

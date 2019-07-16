@@ -106,8 +106,8 @@ public:
     /* Constructor */
     Controller(const Config& configs, DRAM<T>* channel) :
         channel(channel),
-        scheduler(new Scheduler<T>(this)),
-        rowpolicy(new RowPolicy<T>(this)),
+        scheduler(new Scheduler<T>(this, configs["scheduler"])),
+        rowpolicy(new RowPolicy<T>(this, configs["rowpolicy"])),
         rowtable(new RowTable<T>(this)),
         refresh(new Refresh<T>(this)),
         cmd_trace_files(channel->children.size())
