@@ -90,6 +90,7 @@ public:
       {"Random", Translation::Random},
     };
 
+    int log_page_size;
     std::vector<int> free_physical_pages;
     long free_physical_pages_remaining;
     std::map<std::pair<int, long>, long> page_translation;
@@ -147,9 +148,12 @@ public:
           translation = name_to_translation[configs["translation"]];
         }
         if (translation != Translation::None) {
-          // construct a list of available pages
-          // TODO: this should not assume a 4KB page!
-          free_physical_pages_remaining = max_address >> 12;
+          if (configs.contains("page_size")) {
+            log_page_size = calc_log2(std::stoi(configs["page_size"]));
+          } else {
+            log_page_size = 12; // default 4KB page
+          }
+          free_physical_pages_remaining = max_address >> log_page_size;
 
           free_physical_pages.resize(free_physical_pages_remaining, -1);
         }
@@ -520,7 +524,7 @@ public:
     }
 
     long page_allocator(long addr, int coreid) {
-        long virtual_page_number = addr >> 12;
+        long virtual_page_number = addr >> log_page_size;
 
         switch(int(translation)) {
             case int(Translation::None): {
@@ -563,8 +567,7 @@ public:
                     }
                 }
 
-                // SAUGATA TODO: page size should not always be fixed to 4KB
-                return (page_translation[target] << 12) | (addr & ((1 << 12) - 1));
+                return (page_translation[target] << log_page_size) | (addr & ((1 << log_page_size) - 1));
             }
             default:
                 assert(false);
