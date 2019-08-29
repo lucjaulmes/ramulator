@@ -37,7 +37,7 @@ LPDDR4::LPDDR4(Org org, Speed speed)
 }
 
 LPDDR4::LPDDR4(const std::string& org_str, const std::string& speed_str) :
-    LPDDR4(org_map[org_str], speed_map[speed_str])
+    LPDDR4(org_map.at(org_str), speed_map.at(speed_str))
 {
 }
 

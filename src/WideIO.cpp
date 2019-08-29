@@ -36,7 +36,7 @@ WideIO::WideIO(Org org, Speed speed) :
 }
 
 WideIO::WideIO(const std::string& org_str, const std::string& speed_str) :
-    WideIO(org_map[org_str], speed_map[speed_str]) 
+    WideIO(org_map.at(org_str), speed_map.at(speed_str))
 {
 }
 

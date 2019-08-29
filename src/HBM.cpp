@@ -35,7 +35,7 @@ HBM::HBM(Org org, Speed speed)
 }
 
 HBM::HBM(const std::string& org_str, const std::string& speed_str) :
-    HBM(org_map[org_str], speed_map[speed_str])
+    HBM(org_map.at(org_str), speed_map.at(speed_str))
 {
 }
 

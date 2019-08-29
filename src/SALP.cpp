@@ -60,7 +60,7 @@ SALP::SALP(Org org, Speed speed, Type type, int n_sa) :
 }
 
 SALP::SALP(const std::string& org_str, const std::string& speed_str, const std::string& type_str, int n_sa) :
-    SALP(org_map[org_str], speed_map[speed_str], type_map[type_str], n_sa)
+    SALP(org_map.at(org_str), speed_map.at(speed_str), type_map.at(type_str), n_sa)
 {
 }
 

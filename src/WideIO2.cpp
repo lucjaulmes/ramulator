@@ -53,7 +53,7 @@ WideIO2::WideIO2(Org org, Speed speed, int channels) :
 }
 
 WideIO2::WideIO2(const std::string& org_str, const std::string& speed_str, int channels) :
-    WideIO2(org_map[org_str], speed_map[speed_str], channels)
+    WideIO2(org_map.at(org_str), speed_map.at(speed_str), channels)
 {
 }
 
